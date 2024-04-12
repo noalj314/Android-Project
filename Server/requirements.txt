@@ -1,0 +1,17 @@
+blinker
+certifi
+charset-normalizer
+click
+Flask
+Flask-SQLAlchemy
+greenlet
+idna
+importlib-metadata
+itsdangerous
+Jinja2
+psycopg2-binary
+requests
+SQLAlchemy
+urllib3
+Werkzeug
+zipp
