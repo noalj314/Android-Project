@@ -4,5 +4,7 @@
     <content url="file://$MODULE_DIR$" />
     <orderEntry type="jdk" jdkName="Python 3.11 (2)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="S3" />
+    <orderEntry type="module" module-name="S4" />
   </component>
 </module>
