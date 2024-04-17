@@ -21,8 +21,6 @@ bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
 db = SQLAlchemy(app)
 
-
-
 oauth = OAuth(app)
 google = oauth.register(
     name='google',
@@ -37,10 +35,6 @@ google = oauth.register(
     client_kwargs={'scope': 'openid profile email'},
 )
 
-
-
-
-
 if "AZURE_POSTGRESQL_CONNECTIONSTRING" in os.environ:
     conn = os.environ["AZURE_POSTGRESQL_CONNECTIONSTRING"]
     values = dict(x.split('=') for x in conn.split(" "))
@@ -54,9 +48,11 @@ else:
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
 
+
 @app.route('/')
 def homepage():
     return '<a href="/login">Login with Google</a>'
+
 
 @app.route('/authorize_login/', methods=['POST'])
 def login():
@@ -86,6 +82,7 @@ def login():
     except ValueError:
         return jsonify({'message': 'Invalid token'}), 401
 
+
 @app.route('/follow/user/<username>', methods=['POST'])
 @jwt_required()
 def follow_user(username):
@@ -104,9 +101,10 @@ def follow_user(username):
     db.session.commit()
     return jsonify({'message': f"{username} followed"}), 200
 
+
 @app.route('/unfollow/user/<username>', methods=['POST'])
 @jwt_required()
-def unfollow(username):
+def unfollow_user(username):
     current_user_id = get_jwt_identity()
     user_to_unfollow = User.query.filter_by(username=username).first()
     current_user = User.query.filter_by(id=current_user_id).first()
@@ -121,7 +119,34 @@ def unfollow(username):
     return jsonify({'message': f"{username} unfollowed"}), 200
 
 
-@app.route('follow/event/<event_id>', methods=['POST'])
+@app.route('/user/find_user/<username>', methods=['GET'])
+@jwt_required()
+def find_user_by_username(username):
+    user = User.query.filter_by(username=username)
+    if user is None:
+        return jsonify({'message': 'No such user'}), 404
+    return jsonify(user.to_dict()), 200
+
+
+@app.route('/event/create/', methods=['GET'])
+@jwt_required()
+def create_event():
+    user_id = get_jwt_identity()
+    event_data = request.get_json()
+    try:
+        event = Event(title=event_data['title'],
+                      description=event_data['description'],
+                      date=event_data['date'], location=event_data['location'],
+                        created_by_user_id=user_id)
+    except KeyError:
+        return jsonify({'message': 'Missing data'}), 400
+
+    db.session.add(event)
+
+
+
+
+@app.route('event/follow/<event_id>', methods=['POST'])
 @jwt_required()
 def follow_event(event_id):
     current_user_id = get_jwt_identity()
@@ -137,7 +162,8 @@ def follow_event(event_id):
     db.session.commit()
     return jsonify({'message': f"{event_id} followed"}), 200
 
-@app.route('/unfollow/event/<event_id>', methods=['POST'])
+
+@app.route('/event/unfollow/<event_id>', methods=['POST'])
 @jwt_required()
 def unfollow_event(event_id):
     current_user_id = get_jwt_identity()
@@ -169,24 +195,19 @@ def comment_event(event_id):
     event.comments.append(comment)
     db.session.commit()
     return jsonify({'message': 'Comment added'}), 200
+
+
 @app.route('/uncomment/<comment_id>', methods=['POST'])
 @jwt_required()
 def uncomment_event(comment_id):
-    user_id = get_jwt_identity()
-    user = User.query.filter_by(id=user_id).first()
-    event = Event.query.filter_by(id=event_id).first()
-    if user is None:
-        return jsonify({'message': 'No such user'}), 404
-    if event is None:
-        return jsonify({'message': 'No such event'}), 404
-    text = request.get_json()['text']
-    comment = Comment(text=text, user_id=user_id, event_id=event_id)
-    event.comments.remove(comment)
-    db.session.commit()
-    return jsonify({'message': 'Comment removed'}), 200
-
+    comment = Comment.query.get(id=comment_id)
+    if comment is not None and comment.user_id == get_jwt_identity():
+        db.session.delete(comment)
+        db.session.commit()
+        return jsonify({'message': 'Comment removed'}), 200
+    else:
+        return jsonify({'message': 'No such comment or not authorized'}), 400
 
 
 if __name__ == '__main__':
     app.run(debug=True)
-

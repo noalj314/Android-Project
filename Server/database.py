@@ -44,7 +44,9 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     description = db.Column(db.String(200), nullable=False)
 
+
     # Relationships
+    event_created 
     events = db.relationship('event', secondary=event_followed, back_populates="events")
     follows = db.relationship('user', secondary=user_followed, back_populates="users")
     followed = db.relationship(
@@ -67,7 +69,8 @@ class User(db.Model):
 
 class Event(db.Model):
     id = db.Column(db.String, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
+    title = db.Column(db.String(100), nullable=False)
+    created_by_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     location = db.Column(db.String(100), nullable=False)
     date = db.Column(db.DateTime, nullable=False)
     description = db.Column(db.String(200), nullable=False)
