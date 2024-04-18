@@ -128,7 +128,7 @@ def find_user_by_username(username):
     return jsonify(user.to_dict()), 200
 
 
-@app.route('/event/create/', methods=['GET'])
+@app.route('/event/create/', methods=['POST'])
 @jwt_required()
 def create_event():
     user_id = get_jwt_identity()
@@ -136,14 +136,24 @@ def create_event():
     try:
         event = Event(title=event_data['title'],
                       description=event_data['description'],
-                      date=event_data['date'], location=event_data['location'],
-                        created_by_user_id=user_id)
+                      date=event_data['date'], location=event_data['location'], created_by_user_id=user_id)
     except KeyError:
         return jsonify({'message': 'Missing data'}), 400
 
-    db.session.add(event)
+    User.query.filter_by(id=user_id).first().event_created.append(event)  # Add event to user's created events
+    db.session.commit()
+    return jsonify({'message': 'Event created'}), 200
 
-
+@app.route("event/delete/<event_id>", methods=['POST'])
+@jwt_required()
+def delete_event(event_id):
+    user_id = get_jwt_identity()
+    try:
+        User.query.filter_by(id=user_id).first().event_created.remove(event_id)
+    except ValueError:
+        return jsonify({'message': 'No such event to delete'}), 404
+    db.session.commit()
+    return jsonify({'message': 'Event deleted'}), 200
 
 
 @app.route('event/follow/<event_id>', methods=['POST'])
