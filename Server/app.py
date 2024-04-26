@@ -1,25 +1,21 @@
 from datetime import datetime
 
-from flask import Flask, request, jsonify, url_for, session, redirect
-from flask_sqlalchemy import SQLAlchemy
-from flask_sqlalchemy import SQLAlchemy
+from flask import request, jsonify
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
 from flask_jwt_extended import JWTManager
-from flask_jwt_extended import get_jwt
 from flask_bcrypt import Bcrypt
 from database import *
+import requests
+from google.oauth2 import id_token
+from google.auth.transport import requests
 
 from authlib.integrations.flask_client import OAuth
-import os
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///./our.db'
 app.config['JWT_SECRET_KEY'] = "London calling to the faraway towns..."
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
-db = SQLAlchemy(app)
 
 oauth = OAuth(app)
 google = oauth.register(
@@ -35,18 +31,13 @@ google = oauth.register(
     client_kwargs={'scope': 'openid profile email'},
 )
 
-if "AZURE_POSTGRESQL_CONNECTIONSTRING" in os.environ:
-    conn = os.environ["AZURE_POSTGRESQL_CONNECTIONSTRING"]
-    values = dict(x.split('=') for x in conn.split(" "))
-    user = values['user']
-    host = values['host']
-    database = values['dbname']
-    password = values['password']
-    db_uri = f'postgresql+psycopg2://{user}:{password}@{host}/{database}'
-else:
-    db_uri = 'sqlite:///.//our.db'
 
-app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
+@jwt.token_in_blocklist_loader
+def check_if_token_in_blocklist(jwt_header, jwt_payload):
+    """Check if token is in blocklist."""
+    jti = jwt_payload["jti"]
+    token = BlockedTokens.query.filter_by(jti=jti).first()
+    return token is not None
 
 
 @app.route('/')
@@ -54,28 +45,32 @@ def homepage():
     return '<a href="/login">Login with Google</a>'
 
 
-@app.route('/authorize_login/', methods=['POST'])
+@app.route('/user/login/', methods=['POST'])
 def login():
-    input = request.get_json()
-    token = input["idToken"]
+    """ Authorize login with Google. Takes a idToken from Google and checks if correct.
+    We then check if we have a user in our database with the given username, if so login else create user.
+    Then returns a jwt token."""
+    json_input = request.get_json()
+    token = json_input["idToken"]
 
     try:
-        google_request = oauth.Request()
-        data = oauth.verify_oauth2_token(token, google_request)
+
+        google_request = requests.Request()
+        data = id_token.verify_oauth2_token(token, google_request, google)
 
         if data['iss'] in ['accounts.google.com', 'https://accounts.google.com']:
             username = data["sub"]
             email = data["email"]
             description = data["name"]
 
-            user = User.query.filter_by(username=username).first()
-            if user is None:
-                user = User(username=username, email=email, description=description)
-                db.session.add(user)
+            current_user = User.query.filter_by(username=username).first()
+            if current_user is None:
+                current_user = User(username=username, email=email, description=description)
+                db.session.add(current_user)
                 db.session.commit()
 
-            access_token = create_access_token(identity=user.id)
-            data = user.to_dict()
+            access_token = create_access_token(identity=current_user.id)
+            data = current_user.to_dict()
             data['access_token'] = access_token
             return jsonify(data), 200
 
@@ -83,9 +78,20 @@ def login():
         return jsonify({'message': 'Invalid token'}), 401
 
 
-@app.route('/follow/user/<username>', methods=['POST'])
+@app.route('/user/logout', methods=['POST'])
+@jwt_required()
+def logout():
+    """Logout user then add token to blocklist."""
+    jti = get_jwt_identity()
+    db.session.add(BlockedTokens(token_id=jti, time=datetime.now()))
+    db.session.commit()
+    return jsonify({'message': "logged out"}), 200
+
+
+@app.route('/user/follow/<username>', methods=['POST'])
 @jwt_required()
 def follow_user(username):
+    """Follow a user that exists takes a username as argument. Requires a jwt token. """
     current_user_id = get_jwt_identity()
     user_to_follow = User.query.filter_by(username=username).first()
     current_user = User.query.filter_by(id=current_user_id).first()
@@ -97,14 +103,15 @@ def follow_user(username):
         return jsonify({'message': 'You cannot follow yourself'}), 400
     if user_to_follow in current_user.followed:
         return jsonify({'message': 'Already following'}), 400
-    current_user.followed.append(user_to_follow)
+    current_user.follows.append(user_to_follow)
     db.session.commit()
     return jsonify({'message': f"{username} followed"}), 200
 
 
-@app.route('/unfollow/user/<username>', methods=['POST'])
+@app.route('/user/unfollow/<username>', methods=['POST'])
 @jwt_required()
 def unfollow_user(username):
+    """Unfollow a user that the current user follows takes a username as argument. Requires a jwt token."""
     current_user_id = get_jwt_identity()
     user_to_unfollow = User.query.filter_by(username=username).first()
     current_user = User.query.filter_by(id=current_user_id).first()
@@ -120,17 +127,28 @@ def unfollow_user(username):
 
 
 @app.route('/user/find_user/<username>', methods=['GET'])
-@jwt_required()
 def find_user_by_username(username):
-    user = User.query.filter_by(username=username)
-    if user is None:
+    """Find a user by username, used for searching. Requires a jwt token."""
+    user_to_find = User.query.filter_by(username=username)
+    if user_to_find is None:
         return jsonify({'message': 'No such user'}), 404
-    return jsonify(user.to_dict()), 200
+    return jsonify(user_to_find.to_dict()), 200
+
+
+@app.route('/user/get_followers/<user_id>', methods=['GET'])
+@jwt_required()
+def get_followers(user_id):
+    """Get all followers of a user."""
+    user_to_check = User.query.filter_by(id=user_id).first()
+    if user_to_check is None:
+        return jsonify({'message': 'Faulty login'}), 404
+    return jsonify([u.username_to_dict() for u in user_to_check.followers]), 200
 
 
 @app.route('/event/create/', methods=['POST'])
 @jwt_required()
 def create_event():
+    """Allows a user to create an event. Requires title, description, date, location and a jwt token."""
     user_id = get_jwt_identity()
     event_data = request.get_json()
     try:
@@ -144,9 +162,11 @@ def create_event():
     db.session.commit()
     return jsonify({'message': 'Event created'}), 200
 
-@app.route("event/delete/<event_id>", methods=['POST'])
+
+@app.route("/event/delete/<event_id>", methods=['POST'])
 @jwt_required()
 def delete_event(event_id):
+    """Delete an event by event id. Requires a jwt token."""
     user_id = get_jwt_identity()
     try:
         User.query.filter_by(id=user_id).first().event_created.remove(event_id)
@@ -156,9 +176,10 @@ def delete_event(event_id):
     return jsonify({'message': 'Event deleted'}), 200
 
 
-@app.route('event/follow/<event_id>', methods=['POST'])
+@app.route('/event/follow/<event_id>', methods=['POST'])
 @jwt_required()
 def follow_event(event_id):
+    """Follow an event by event id. Requires a jwt token."""
     current_user_id = get_jwt_identity()
     event_to_follow = User.query.filter_by(id=event_id).first()
     current_user = User.query.filter_by(id=current_user_id).first()
@@ -176,6 +197,7 @@ def follow_event(event_id):
 @app.route('/event/unfollow/<event_id>', methods=['POST'])
 @jwt_required()
 def unfollow_event(event_id):
+    """Unfollow an event by event id. Requires a jwt token."""
     current_user_id = get_jwt_identity()
     event_to_unfollow = User.query.filter_by(id=event_id).first()
     current_user = User.query.filter_by(id=current_user_id).first()
@@ -190,13 +212,13 @@ def unfollow_event(event_id):
     return jsonify({'message': f"{event_id} unfollowed"}), 200
 
 
-@app.route('/<event-id>/comment/', methods=['POST'])
+@app.route('/event/comment/event_id', methods=['POST'])
 @jwt_required()
 def comment_event(event_id):
+    """Comment an event by event id. Requires a jwt token."""
     user_id = get_jwt_identity()
-    user = User.query.filter_by(id=user_id).first()
     event = Event.query.filter_by(id=event_id).first()
-    if user is None:
+    if User.query.filter_by(id=user_id).first() is None:
         return jsonify({'message': 'No such user'}), 404
     if event is None:
         return jsonify({'message': 'No such event'}), 404
@@ -207,9 +229,10 @@ def comment_event(event_id):
     return jsonify({'message': 'Comment added'}), 200
 
 
-@app.route('/uncomment/<comment_id>', methods=['POST'])
+@app.route('/event/uncomment/<event_id>', methods=['POST'])
 @jwt_required()
 def uncomment_event(comment_id):
+    """Uncomment an event by comment id. Requires a jwt token."""
     comment = Comment.query.get(id=comment_id)
     if comment is not None and comment.user_id == get_jwt_identity():
         db.session.delete(comment)
@@ -217,6 +240,13 @@ def uncomment_event(comment_id):
         return jsonify({'message': 'Comment removed'}), 200
     else:
         return jsonify({'message': 'No such comment or not authorized'}), 400
+
+
+@app.route('/event/get_events/', methods=['GET'])
+def get_events():
+    """Get all events."""
+    events = Event.query.all()
+    return jsonify([event.to_dict() for event in events]), 200
 
 
 if __name__ == '__main__':
