@@ -140,6 +140,7 @@ def find_user_by_username(username):
 def get_followers(user_id):
     """Get all followers of a user."""
     user_to_check = User.query.filter_by(id=user_id).first()
+    user_to_check = User.query.filter_by(id=user_id).first()
     if user_to_check is None:
         return jsonify({'message': 'Faulty login'}), 404
     return jsonify([u.username_to_dict() for u in user_to_check.followers]), 200
@@ -161,7 +162,7 @@ def create_event():
     try:
         event = Event(title=event_data['title'],
                       description=event_data['description'],
-                      date=event_data['date'], location=event_data['location'], created_by_user_id=user_id, id=event_data['id'])
+                      date=event_data['date'], location=event_data['location'], user_id=user_id)
         db.session.add(event)
         User.query.filter_by(id=user_id).first().created_events.append(event)
 
@@ -175,10 +176,16 @@ def create_event():
 def delete_event(event_id):
     """Delete an event by event id. Requires a jwt token."""
     user_id = get_jwt_identity()
-    try:
-        User.query.filter_by(id=user_id).first().event_created.remove(event_id)
-    except ValueError:
+    event_to_delete = db.session.get(Event, event_id)
+    if event_to_delete is None:
         return jsonify({'message': 'No such event to delete'}), 404
+
+    user = User.query.filter_by(id=user_id).first()
+    if user is None:
+        return jsonify({'message': 'No such user'}), 404
+    db.session.delete(event_to_delete)
+    user.created_events.remove(event_to_delete)
+
     db.session.commit()
     return jsonify({'message': 'Event deleted'}), 200
 
@@ -188,15 +195,15 @@ def delete_event(event_id):
 def follow_event(event_id):
     """Follow an event by event id. Requires a jwt token."""
     current_user_id = get_jwt_identity()
-    event_to_follow = User.query.filter_by(id=event_id).first()
+    event_to_follow = Event.query.filter_by(id=event_id).first()
     current_user = User.query.filter_by(id=current_user_id).first()
     if event_to_follow is None:
         return jsonify({'message': 'No such event to follow'}), 404
     if current_user is None:
         return jsonify({'message': 'Faulty login'}), 404
-    if event_to_follow in current_user.events:
+    if event_to_follow in current_user.followed_events:
         return jsonify({'message': 'Already following'}), 400
-    current_user.events.append(event_to_follow)
+    current_user.followed_events.append(event_to_follow)
     db.session.commit()
     return jsonify({'message': f"{event_id} followed"}), 200
 
@@ -212,14 +219,14 @@ def unfollow_event(event_id):
         return jsonify({'message': 'No such event to unfollow'}), 404
     if current_user is None:
         return jsonify({'message': 'Faulty login'}), 404
-    if event_to_unfollow not in current_user.events:
+    if event_to_unfollow not in current_user.followed_events:
         return jsonify({'message': 'Not following'}), 400
-    current_user.events.remove(event_to_unfollow)
+    current_user.followed_events.remove(event_to_unfollow)
     db.session.commit()
     return jsonify({'message': f"{event_id} unfollowed"}), 200
 
 
-@app.route('/event/comment/event_id', methods=['POST'])
+@app.route('/event/comment/<event_id>', methods=['POST'])
 @jwt_required()
 def comment_event(event_id):
     """Comment an event by event id. Requires a jwt token."""
@@ -231,16 +238,17 @@ def comment_event(event_id):
         return jsonify({'message': 'No such event'}), 404
     text = request.get_json()['text']
     comment = Comment(text=text, user_id=user_id, event_id=event_id)
+    db.session.add(comment)
     event.comments.append(comment)
     db.session.commit()
     return jsonify({'message': 'Comment added'}), 200
 
 
-@app.route('/event/uncomment/<event_id>', methods=['POST'])
+@app.route('/event/uncomment/<comment_id>', methods=['POST'])
 @jwt_required()
 def uncomment_event(comment_id):
     """Uncomment an event by comment id. Requires a jwt token."""
-    comment = Comment.query.get(id=comment_id)
+    comment = Comment.query.filter_by(id=comment_id).first()
     if comment is not None and comment.user_id == get_jwt_identity():
         db.session.delete(comment)
         db.session.commit()

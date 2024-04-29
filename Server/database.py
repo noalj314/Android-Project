@@ -41,21 +41,27 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     description = db.Column(db.String(200), nullable=False)
 
+
     # Relationships
-    created_events = db.relationship('Event', back_populates="event_created_by", lazy='dynamic')
-    followed_events = db.relationship('Event', secondary=event_followed, back_populates="event_followed_by")
+    created_events = db.relationship('Event', backref="user", lazy='dynamic')
+    comments = db.relationship('Comment', backref='user', lazy='dynamic')
+
+
+    followed_events = db.relationship('Event', secondary=event_followed,
+                                      back_populates="event_followed_by", lazy='dynamic')
+
     follows = db.relationship('User', secondary=user_followed,
                               primaryjoin=(user_followed.c.follower_id == id),
                               secondaryjoin=(user_followed.c.followed_id == id),
                               foreign_keys=[user_followed.c.follower_id, user_followed.c.followed_id],
                               back_populates="followers", lazy='dynamic')
+
     followers = db.relationship('User', secondary=user_followed,
                                 primaryjoin=(user_followed.c.followed_id == id),
                                 secondaryjoin=(user_followed.c.follower_id == id),
                                 foreign_keys=[user_followed.c.followed_id, user_followed.c.follower_id],
                                 back_populates="follows", lazy='dynamic')
 
-    comments = db.relationship('Comment', back_populates='user')
 
     def to_dict(self):
         return {
@@ -75,17 +81,18 @@ class User(db.Model):
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String(100), nullable=False)
-    created_by_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     location = db.Column(db.String(100), nullable=False)
     date = db.Column(db.String, nullable=False)
     description = db.Column(db.String(200), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
 
     # Relationships
 
-    event_created_by = db.relationship('User', back_populates='created_events')
-    comments = db.relationship('Comment', back_populates='event')
-    event_followed_by = db.relationship('User', back_populates='followed_events')
+    comments = db.relationship('Comment', backref='event', lazy='dynamic')
 
+    event_followed_by = db.relationship('User', secondary=event_followed,
+                                        back_populates="followed_events", lazy='dynamic')
     def event_to_dict(self):
         return {
             'id': self.id,
@@ -101,11 +108,8 @@ class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     text = db.Column(db.String(200), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    event_id = db.Column(db.String, db.ForeignKey('event.id'), nullable=False)
+    event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
 
-    # Relationships
-    user = db.relationship('User', back_populates='comments')
-    event = db.relationship('Event', back_populates='comments')
 
 
 

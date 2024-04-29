@@ -99,7 +99,6 @@ def test_follow(client, test_login, test_login_user_2):
     """Test if a user can follow another user. To test this be logged in as user 1."""
     jwt_token = test_login
     response = client.post('/user/follow/2', headers={'Authorization': f'Bearer {jwt_token}'})
-
     assert response.status_code == 200
 
 def test_unfollow(client, test_login, test_login_user_2):
@@ -107,17 +106,49 @@ def test_unfollow(client, test_login, test_login_user_2):
     response = client.post('/user/unfollow/2', headers={'Authorization': f'Bearer {jwt_token}'})
     assert response.status_code == 200
 
+
 def test_create_event(client, test_login):
     jwt_token = test_login
     event_data = {
         "title": "Test Event",
         "description": "This is a test event",
         "location": "Test Location",
-        "date": "12", "id": "1"
+        "date": "12"
     }
-    response = client.post('/event/create', headers={'Authorization': f'Bearer {jwt_token}'}, json=event_data)
+    response = client.post('/event/create', headers={'Authorization': f'Bearer {jwt_token}'},
+                           json=event_data)
     assert response.status_code == 200
 
-def test_remove_event(client, test_login):
+def test_follow_event(client, test_login_user_2):
+    jwt_token = test_login_user_2
+    response = client.post('/event/follow/1',  headers={'Authorization': f'Bearer {jwt_token}'})
+    assert response.status_code == 200
+
+
+
+def test_unfollow_event(client, test_login_user_2):
+    jwt_token = test_login_user_2
+    response = client.post('/event/unfollow/1', headers={'Authorization': f'Bearer {jwt_token}'})
+    assert response.status_code == 400
+
+
+def test_comment_event(client, test_login):
     jwt_token = test_login
-    response = client.post('/event/remove/1', headers={'
+    comment_data = {
+        "text": "This is a comment"
+    }
+    response = client.post('/event/comment/1', headers={'Authorization': f'Bearer {jwt_token}'}, json=comment_data)
+    assert response.status_code == 200
+
+def test_uncomment_event(client, test_login):
+    jwt_token = test_login
+    response = client.post('/event/uncomment/1', headers={'Authorization': f'Bearer {jwt_token}'})
+    assert response.status_code == 200
+
+
+
+
+def test_del_event(client, test_login):
+    jwt_token = test_login
+    response = client.post('/event/delete/1',  headers={'Authorization': f'Bearer {jwt_token}'})
+    assert response.status_code == 200
