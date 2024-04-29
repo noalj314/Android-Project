@@ -101,7 +101,7 @@ def follow_user(username):
         return jsonify({'message': 'Faulty login'}), 404
     if current_user == user_to_follow:
         return jsonify({'message': 'You cannot follow yourself'}), 400
-    if user_to_follow in current_user.followed:
+    if user_to_follow in current_user.follows:
         return jsonify({'message': 'Already following'}), 400
     current_user.follows.append(user_to_follow)
     db.session.commit()
@@ -119,9 +119,9 @@ def unfollow_user(username):
         return jsonify({'message': 'No such user to unfollow'}), 404
     if current_user is None:
         return jsonify({'message': 'Faulty login'}), 404
-    if user_to_unfollow not in current_user.followed:
+    if user_to_unfollow not in current_user.follows:
         return jsonify({'message': 'Not following'}), 400
-    current_user.followed.remove(user_to_unfollow)
+    current_user.follows.remove(user_to_unfollow)
     db.session.commit()
     return jsonify({'message': f"{username} unfollowed"}), 200
 
@@ -145,23 +145,30 @@ def get_followers(user_id):
     return jsonify([u.username_to_dict() for u in user_to_check.followers]), 200
 
 
-@app.route('/event/create/', methods=['POST'])
+def get_following(user_id):
+    """Get all users that a user follows."""
+    user_to_check = User.query.filter_by(id=user_id).first()
+    if user_to_check is None:
+        return jsonify({'message': 'Faulty login'}), 404
+    return jsonify([u for u in user_to_check.follows]), 200
+
+
+@app.route('/event/create', methods=['POST'])
 @jwt_required()
 def create_event():
-    """Allows a user to create an event. Requires title, description, date, location and a jwt token."""
     user_id = get_jwt_identity()
     event_data = request.get_json()
     try:
         event = Event(title=event_data['title'],
                       description=event_data['description'],
-                      date=event_data['date'], location=event_data['location'], created_by_user_id=user_id)
+                      date=event_data['date'], location=event_data['location'], created_by_user_id=user_id, id=event_data['id'])
+        db.session.add(event)
+        User.query.filter_by(id=user_id).first().created_events.append(event)
+
+        db.session.commit()
+        return jsonify({'message': 'Event created'}), 200
     except KeyError:
-        return jsonify({'message': 'Missing data'}), 400
-
-    User.query.filter_by(id=user_id).first().event_created.append(event)  # Add event to user's created events
-    db.session.commit()
-    return jsonify({'message': 'Event created'}), 200
-
+        return jsonify({'message': 'Missing required data'}), 400
 
 @app.route("/event/delete/<event_id>", methods=['POST'])
 @jwt_required()

@@ -32,9 +32,6 @@ event_followed = db.Table('event_followed',
 event_going = db.Table('event_going',
                        db.Column('user_id', db.String, db.ForeignKey('user.id'), primary_key=True),
                        db.Column('event_id', db.String, db.ForeignKey('event.id'), primary_key=True))
-event_created = db.Table('events_created',
-                         db.Column('user_id', db.String, db.ForeignKey('user.id'), primary_key=True),
-                         db.Column('event_id', db.String, db.ForeignKey('event.id'), primary_key=True))
 
 
 class User(db.Model):
@@ -45,7 +42,7 @@ class User(db.Model):
     description = db.Column(db.String(200), nullable=False)
 
     # Relationships
-    events = db.relationship('Event', backref="user", lazy='dynamic')
+    created_events = db.relationship('Event', back_populates="event_created_by", lazy='dynamic')
     followed_events = db.relationship('Event', secondary=event_followed, back_populates="event_followed_by")
     follows = db.relationship('User', secondary=user_followed,
                               primaryjoin=(user_followed.c.follower_id == id),
@@ -76,15 +73,16 @@ class User(db.Model):
 
 
 class Event(db.Model):
-    id = db.Column(db.String, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String(100), nullable=False)
     created_by_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     location = db.Column(db.String(100), nullable=False)
-    date = db.Column(db.DateTime, nullable=False)
+    date = db.Column(db.String, nullable=False)
     description = db.Column(db.String(200), nullable=False)
 
     # Relationships
 
+    event_created_by = db.relationship('User', back_populates='created_events')
     comments = db.relationship('Comment', back_populates='event')
     event_followed_by = db.relationship('User', back_populates='followed_events')
 
