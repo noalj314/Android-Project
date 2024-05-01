@@ -81,9 +81,8 @@ public class ProfileFragment extends Fragment implements ClickListener {
         queue.add(stringRequest);
     }
 
-    public void textClicked(String itemName) {
-        /*
+    public void textClicked() {
         HomeActivity homeActivity = (HomeActivity)(getActivity());
-        homeActivity.navigateToProfile(itemName);*/
+        homeActivity.navigateHome();
     }
 }

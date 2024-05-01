@@ -6,8 +6,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
+import androidx.navigation.ui.NavigationUI;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -17,11 +19,12 @@ import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private DrawerLayout drawerLayout;
     private MenuItem homeItem;
     private MenuItem aboutItem;
+    private NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +35,8 @@ public class HomeActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         drawerLayout = findViewById(R.id.drawer_layout);
-        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open_nav,
                 R.string.close_nav);
@@ -40,9 +44,30 @@ public class HomeActivity extends AppCompatActivity {
         toggle.syncState();
 
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ProfileFragment()).commit();
-            navigationView.setCheckedItem(R.id.nav_profile);
+            //getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HomeFragment()).commit();
+            navigationView.setCheckedItem(R.id.nav_home);
         }
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        final int id = item.getItemId();
+
+        if (id == R.id.nav_home) {
+            Navigation.findNavController(this, R.id.fragment_container).navigate(ProfileFragmentDirections.actionProfileFragmentToHomeFragment());
+            navigationView.setCheckedItem(R.id.nav_home);
+            //NavDirections action2 = ProfileFragmentDirections.actionProfileFragmentToHomeFragment();
+            //Navigation.findNavController(this, R.id.fragment_container);//navigate(action2);
+        }
+        else if (id == R.id.nav_profile) {
+            Navigation.findNavController(this, R.id.fragment_container).navigate(HomeFragmentDirections.actionHomeFragmentToProfileFragment());
+            navigationView.setCheckedItem(R.id.nav_profile);
+            //NavDirections action = HomeFragmentDirections.actionHomeFragmentToProfileFragment();
+            //Navigation.findNavController(this, R.id.fragment_container).navigate(action);
+        }
+
+        drawerLayout.closeDrawer(GravityCompat.START);
+        return true;
     }
 
     @Override
@@ -53,17 +78,20 @@ public class HomeActivity extends AppCompatActivity {
             super.onBackPressed();
         }
     }
-/*
 
-    public void navigateHome(View v) {
-        NavDirections action = ProfileFragmentDirections.action_profileFragment_to_homeFragment();
-        Navigation.findNavController(v).navigate(action);
+
+    public void navigateHome() {
+        Navigation.findNavController(this, R.id.fragment_container).navigate(ProfileFragmentDirections.actionProfileFragmentToHomeFragment());
+        //NavDirections action = ProfileFragmentDirections.actionProfileFragmentToHomeFragment();
+        //Navigation.findNavController(this, R.id.container).navigate(action);
+        //Navigation.findNavController(v).navigate(action);
     }
 
 
-    public void navigateToProfile(String itemName) {
-        NavDirections action = HomeFragmentDirections.action_homeFragment_to_profileFragment(itemName);
-        Navigation.findNavController(this, R.id.container).navigate(action);
+    public void navigateToProfile(View v) {
+        Navigation.findNavController(v).navigate(HomeFragmentDirections.actionHomeFragmentToProfileFragment());
+        //NavDirections action = HomeFragmentDirections.actionHomeFragmentToProfileFragment();
+        //Navigation.findNavController(this, R.id.fragment_container).navigate(action);
     }
- */
+
 }

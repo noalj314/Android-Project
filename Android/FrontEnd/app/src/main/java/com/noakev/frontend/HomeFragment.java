@@ -22,13 +22,15 @@ public class HomeFragment extends Fragment {
 
         profileBtn = binding.profilebutton;
 
-        //profileBtn.setOnClickListener(v -> textClicked(v));
+        profileBtn.setOnClickListener(v -> textClicked(v));
 
         return binding.getRoot();
     }
 
-    /*public void textClicked(View v) {
+
+    public void textClicked(View v) {
         HomeActivity homeActivity = (HomeActivity) (getActivity());
         homeActivity.navigateToProfile(v);
-    }*/
+    }
+
 }
