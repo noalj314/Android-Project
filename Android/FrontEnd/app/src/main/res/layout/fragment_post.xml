@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".PostFragment">
+
+        <TextView
+            android:id="@+id/signintext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="New Post"
+            android:textColor="@color/black"
+            android:background="#10ffffff"
+            android:textSize="35dp"
+            android:textStyle="bold"
+            android:layout_margin="50dp"
+            android:gravity="center"
+            />
+
+        <EditText
+            android:id="@+id/usernametext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/signintext"
+            android:textStyle="bold"
+            android:background="#50ffffff"
+            android:hint="Type an imagetext..."
+            android:textColorHint="@color/black"
+            android:textColor="@color/black"
+            android:layout_margin="10dp"
+            android:padding="20dp"
+            />
+
+        <EditText
+            android:id="@+id/passwordtext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/usernametext"
+            android:textStyle="bold"
+            android:background="#50ffffff"
+            android:hint="Password"
+            android:textColorHint="@color/black"
+            android:textColor="@color/black"
+            android:layout_margin="10dp"
+            android:padding="20dp"
+            />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/locationbtn"
+            android:layout_below="@id/passwordtext"
+            android:text="Add Location"
+            android:backgroundTint="#20BFD3"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="20dp"
+            />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/postbtn"
+            android:layout_below="@id/locationbtn"
+            android:text="post"
+            android:backgroundTint="#20BFD3"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="20dp"
+            />
+
+    <!-- TODO: Update blank fragment layout -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Post Fragment"
+        android:textSize="30sp"
+        android:layout_below="@id/loginbtn"
+        android:layout_centerHorizontal="true"
+        android:textColor="@color/lavender"/>
+
+</RelativeLayout>

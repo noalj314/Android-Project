@@ -82,7 +82,5 @@ public class ProfileFragment extends Fragment implements ClickListener {
     }
 
     public void textClicked() {
-        HomeActivity homeActivity = (HomeActivity)(getActivity());
-        homeActivity.navigateHome();
     }
 }
