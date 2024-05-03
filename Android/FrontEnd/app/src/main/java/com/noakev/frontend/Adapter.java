@@ -55,7 +55,6 @@ public class Adapter extends RecyclerView.Adapter<Adapter.RecyclerViewHolder> {
     }
 
     public class RecyclerViewHolder extends RecyclerView.ViewHolder {
-
         private TextView view;
         public RecyclerViewHolder(RowBinding binding) {
             super(binding.getRoot());

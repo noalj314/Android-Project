@@ -100,7 +100,7 @@
         android:textStyle="bold"
         android:id="@+id/comments"
         android:text="View All 20 Comments"
-        android:textColor="@color/black"/>
+        android:textColor="@color/gray"/>
 
 
     </LinearLayout>
