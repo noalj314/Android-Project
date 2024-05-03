@@ -37,9 +37,8 @@ public class PostFragment extends Fragment {
     private Button postBtn;
     private LocationManager locationManager;
     private LocationListener locationListener;
-
-    TextView title;
-    TextView password = (TextView) binding.passwordtext;
+    private TextView title;
+    private TextView password;
     private String currentAddress = null;
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -57,17 +56,16 @@ public class PostFragment extends Fragment {
         postBtn = binding.postbtn;
 
         locationBtn.setOnClickListener(v -> askForLocation());
-        postBtn.setOnClickListener(v -> createNewPost());
+        //postBtn.setOnClickListener(v -> createNewPost());
 
         return binding.getRoot();
     }
 
     private void createNewPost() {
-        Post post = new Post(title.getText(), password.getText(), currentAddress);
+        //Post post = new Post(title.getText(), password.getText(), currentAddress);
     }
 
     private void askForLocation() {
-
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         locationListener = new LocationListener() {
             @Override

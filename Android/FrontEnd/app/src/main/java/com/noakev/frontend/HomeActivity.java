@@ -10,7 +10,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.navigation.ui.NavigationUI;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -35,10 +37,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
-public class HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class HomeActivity extends AppCompatActivity {
 
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
+    private NavController navController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,40 +53,15 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        navController = Navigation.findNavController(this, R.id.fragment_container);
+        NavigationUI.setupWithNavController(navigationView, navController);
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open_nav,
                 R.string.close_nav);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
-        navigationView.setCheckedItem(R.id.nav_home);
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        final int id = item.getItemId();
-
-        if (id == R.id.nav_home) {
-            Navigation.findNavController(this, R.id.fragment_container).navigate(ProfileFragmentDirections.actionProfileFragmentToHomeFragment());
-            //Navigation.findNavController(this, R.id.fragment_container).navigate(PostFragmentDirections.actionPostFragmentToHomeFragment());
-            navigationView.setCheckedItem(R.id.nav_home);
-        } else if (id == R.id.nav_profile) {
-            Navigation.findNavController(this, R.id.fragment_container).navigate(HomeFragmentDirections.actionHomeFragmentToProfileFragment());
-            //Navigation.findNavController(this, R.id.fragment_container).navigate(PostFragmentDirections.actionPostFragmentToProfileFragment());
-            navigationView.setCheckedItem(R.id.nav_profile);
-        } else if (id == R.id.nav_post) {
-            Navigation.findNavController(this, R.id.fragment_container).navigate(HomeFragmentDirections.actionHomeFragmentToPostFragment());
-            //Navigation.findNavController(this, R.id.fragment_container).navigate(ProfileFragmentDirections.actionProfileFragmentToPostFragment());
-            navigationView.setCheckedItem(R.id.nav_post);
-        } else if (id == R.id.nav_logout) {
-            Toast.makeText(HomeActivity.this, "LOGGING OUT", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(HomeActivity.this, LogInActivity.class);
-            startActivity(intent);
-        }
-
-        drawerLayout.closeDrawer(GravityCompat.START);
-        return true;
+        navigationView.setCheckedItem(R.id.homeFragment);
     }
 
     @Override
