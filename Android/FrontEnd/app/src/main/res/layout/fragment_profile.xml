@@ -6,10 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center_horizontal"
     >
-
-    <!-- TODO: Update blank fragment layout -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -19,26 +16,65 @@
         android:layout_marginTop="20dp"
         />
 
-    <TextView
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:id="@+id/selfieholder"
+            android:paddingVertical="10dp"
+            android:paddingHorizontal="10dp"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/selfieholder"
+            android:layout_centerInParent="true"
+            android:text="username"
+            android:layout_marginHorizontal="20dp"
+            />
+
+        <Button
+            android:id="@+id/selfiebutton"
+            android:layout_width="103dp"
+            android:layout_height="wrap_content"
+            android:text="Selfie"
+            android:layout_alignParentRight="true"
+            android:layout_marginHorizontal="20dp"
+            android:layout_centerInParent="true"
+            />
+
+
+    </RelativeLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Followers"
+            android:layout_marginVertical="20dp"
+            />
+
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/groups"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginTop="20dp"
+            android:scrollbars = "vertical"
+            />
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Followers"
-        android:layout_marginVertical="20dp"
-        />
+        android:gravity="center">
 
-    <Button
-        android:id="@+id/profilebutton"
-        android:layout_width="103dp"
-        android:layout_height="wrap_content"
-        android:text="home" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/groups"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_marginTop="20dp"
-        android:scrollbars = "vertical"
-        />
+    </RelativeLayout>
+
+
 
 
 

@@ -48,7 +48,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         HashMap data = this.localData.get(position);
-        Log.v("asd","asd"+data);
+            Log.v("asd","asd"+data);
 
         //holder.username.setText(localData);
         //holder.username.setText("asd");
