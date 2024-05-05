@@ -32,11 +32,11 @@ public class Adapter extends RecyclerView.Adapter<Adapter.RecyclerViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerViewHolder holder, int position) {
-        String element = data.get(position);
-        holder.getView().setText(element);
+        String profileName = data.get(position);
+        holder.getView().setText(profileName);
 
         holder.itemView.setOnClickListener(v -> {
-            if (listener != null) listener.textClicked();
+            if (listener != null) listener.textClicked(profileName);
         });
     }
 

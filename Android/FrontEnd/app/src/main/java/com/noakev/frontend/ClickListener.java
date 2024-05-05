@@ -1,5 +1,5 @@
 package com.noakev.frontend;
 
 public interface ClickListener {
-    void textClicked();
+    void textClicked(String profileName);
 }
