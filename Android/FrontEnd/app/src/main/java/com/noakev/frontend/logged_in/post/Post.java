@@ -1,4 +1,4 @@
-package com.noakev.frontend;
+package com.noakev.frontend.logged_in.post;
 
 public class Post {
     private String postid;

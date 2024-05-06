@@ -24,7 +24,7 @@
         android:theme="@style/Theme.NavigationDrawer"
         tools:targetApi="31">
         <activity
-            android:name=".HomeActivity"
+            android:name=".logged_in.HomeActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"
             android:exported="true">
             <intent-filter>
@@ -38,7 +38,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".LogInActivity"
+            android:name=".logged_out.LogInActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"
             android:exported="true">
             <intent-filter>

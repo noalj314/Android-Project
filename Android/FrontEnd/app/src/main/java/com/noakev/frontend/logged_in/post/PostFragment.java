@@ -1,4 +1,4 @@
-package com.noakev.frontend;
+package com.noakev.frontend.logged_in.post;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -23,7 +23,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.noakev.frontend.databinding.FragmentPostBinding;
-import com.noakev.frontend.databinding.FragmentProfileBinding;
 
 import java.io.IOException;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.noakev.frontend;
+package com.noakev.frontend.logged_out;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -10,6 +10,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.noakev.frontend.databinding.ActivityLoginBinding;
+import com.noakev.frontend.logged_in.HomeActivity;
 
 public class LogInActivity extends AppCompatActivity {
     @Override

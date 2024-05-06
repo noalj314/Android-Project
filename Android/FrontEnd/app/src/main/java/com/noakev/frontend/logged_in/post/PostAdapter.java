@@ -1,21 +1,20 @@
-package com.noakev.frontend;
+package com.noakev.frontend.logged_in.post;
 
-import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.noakev.frontend.logged_in.profile.ClickListener;
+import com.noakev.frontend.R;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 

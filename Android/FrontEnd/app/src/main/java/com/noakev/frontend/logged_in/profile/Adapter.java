@@ -1,4 +1,4 @@
-package com.noakev.frontend;
+package com.noakev.frontend.logged_in.profile;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -7,9 +7,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.noakev.frontend.databinding.FragmentProfileBinding;
-import com.noakev.frontend.databinding.RowBinding;
 
+import com.noakev.frontend.databinding.RowBinding;
 
 import java.util.ArrayList;
 
@@ -40,7 +39,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.RecyclerViewHolder> {
         });
     }
 
-    public void setListener(ProfileFragment listener) {
+    public void setListener(ClickListener listener) {
         this.listener = listener;
     }
 

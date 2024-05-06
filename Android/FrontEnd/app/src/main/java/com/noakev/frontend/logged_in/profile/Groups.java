@@ -1,4 +1,4 @@
-package com.noakev.frontend;
+package com.noakev.frontend.logged_in.profile;
 
 
 import java.util.ArrayList;

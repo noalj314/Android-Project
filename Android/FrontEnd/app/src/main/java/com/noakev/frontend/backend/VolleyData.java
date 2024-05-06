@@ -1,14 +1,18 @@
-package com.noakev.frontend;
+package com.noakev.frontend.backend;
 
 import android.util.Log;
 
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.noakev.frontend.logged_in.profile.ProfileFragment;
+import com.noakev.frontend.logged_in.profile.Groups;
 
 public class VolleyData {
+    public void sendVolleyRequest(String route, JsonObject jsonObject) {
+
+    }
     public void getDataVolley(String url, ProfileFragment.DataFetchedCallback callback) {
         // Instantiate the RequestQueue.
         //RequestQueue queue = Volley.newRequestQueue(getContext());
@@ -26,3 +30,17 @@ public class VolleyData {
        // queue.add(stringRequest);
     }
 }
+/*
+        try {
+            obj.put("username", "myname");
+            obj.put("password", "mypass");
+        }
+        catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+
+        volleyData.sendRequest("/user/login", obj, Request.Method.POST, null, (data) {
+            // Gson stuff
+
+        });
+ */
