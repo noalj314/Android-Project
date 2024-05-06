@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".logged_in.profile.OtherProfilesFragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Other Profile Fragment"
+        android:textColor="@color/lavender"
+        android:textSize="30sp"
+        android:layout_marginTop="20dp"
+        />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:id="@+id/selfieholder"
+            android:paddingVertical="10dp"
+            android:paddingHorizontal="10dp"
+            />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/selfieholder"
+            android:layout_centerInParent="true"
+            android:orientation="vertical"
+            >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/username"
+                android:text="username"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/numberoffollowers"
+                android:text="Followers: 23"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/numberoffollowing"
+                android:text="Following: 17"
+                />
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        >
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginStart="50dp"
+            ><TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Followers"
+            android:layout_marginVertical="20dp"
+            />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/groups"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:scrollbars = "vertical"
+                />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginStart="50dp"
+            ><TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Following"
+            android:layout_marginVertical="20dp"
+            />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/followinggroups"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:scrollbars = "vertical"
+                />
+        </LinearLayout>
+
+        <TableLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        </TableLayout>
+    </LinearLayout>
+
+</LinearLayout>
+

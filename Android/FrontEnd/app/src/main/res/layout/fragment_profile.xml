@@ -2,14 +2,11 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".ProfileFragment"
+    tools:context=".logged_in.profile.ProfileFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center_horizontal"
     >
-
-    <!-- TODO: Update blank fragment layout -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -19,28 +16,106 @@
         android:layout_marginTop="20dp"
         />
 
-    <TextView
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Followers"
-        android:layout_marginVertical="20dp"
-        />
+        >
 
-    <Button
-        android:id="@+id/profilebutton"
-        android:layout_width="103dp"
-        android:layout_height="wrap_content"
-        android:text="home" />
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:id="@+id/selfieholder"
+            android:paddingVertical="10dp"
+            android:paddingHorizontal="10dp"
+            />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/groups"
-        android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/selfieholder"
+            android:layout_centerInParent="true"
+            android:orientation="vertical"
+            >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/username"
+                android:text="username"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/numberoffollowers"
+                android:text="Followers: 23"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/numberoffollowing"
+                android:text="Following: 17"
+                />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/selfiebutton"
+            android:layout_width="103dp"
+            android:layout_height="wrap_content"
+            android:text="Selfie"
+            android:layout_alignParentRight="true"
+            android:layout_marginHorizontal="20dp"
+            android:layout_centerInParent="true"
+            />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="20dp"
-        android:scrollbars = "vertical"
-        />
+        android:orientation="horizontal"
+        >
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginStart="50dp"
+            ><TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Followers"
+                android:layout_marginVertical="20dp"
+                />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/groups"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:scrollbars = "vertical"
+                />
+        </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginStart="50dp"
+            ><TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Following"
+            android:layout_marginVertical="20dp"
+            />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/followinggroups"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:scrollbars = "vertical"
+                />
+        </LinearLayout>
 
+        <TableLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        </TableLayout>
+    </LinearLayout>
 
 </LinearLayout>
 
