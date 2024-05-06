@@ -125,7 +125,6 @@ def test_follow_event(client, test_login_user_2):
     assert response.status_code == 200
 
 
-
 def test_unfollow_event(client, test_login_user_2):
     jwt_token = test_login_user_2
     response = client.post('/event/unfollow/1', headers={'Authorization': f'Bearer {jwt_token}'})
@@ -140,15 +139,42 @@ def test_comment_event(client, test_login):
     response = client.post('/event/comment/1', headers={'Authorization': f'Bearer {jwt_token}'}, json=comment_data)
     assert response.status_code == 200
 
+
 def test_uncomment_event(client, test_login):
     jwt_token = test_login
     response = client.post('/event/uncomment/1', headers={'Authorization': f'Bearer {jwt_token}'})
     assert response.status_code == 200
 
 
-
-
 def test_del_event(client, test_login):
     jwt_token = test_login
     response = client.post('/event/delete/1',  headers={'Authorization': f'Bearer {jwt_token}'})
     assert response.status_code == 200
+
+
+def test_get_followers(client, test_login, test_login_user_2):
+    # First, make user 2 follow user 1
+    jwt_token_user_2 = test_login_user_2
+    client.post('/user/follow/us1', headers={'Authorization': f'Bearer {jwt_token_user_2}'})
+
+    # Then retrieve followers for user 1
+    jwt_token_user_1 = test_login
+    response = client.get('/user/get_followers/1', headers={'Authorization': f'Bearer {jwt_token_user_1}'})
+    assert response.status_code == 200
+    followers = response.json
+    assert any(follower['username'] == '2' for follower in followers)
+
+
+def test_invalid_login(client):
+    # Attempt login with an invalid token
+    response = client.post('/user/login/', json={'idToken': 'invalid_token'})
+    assert response.status_code == 401
+    assert 'Invalid token' in response.json['message']
+
+
+def test_access_denied_without_jwt(client):
+    response = client.post('/user/follow/us1')
+    assert response.status_code == 401
+    assert 'msg' in response.json and response.json['msg'] == 'Missing Authorization Header'
+
+

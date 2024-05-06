@@ -151,7 +151,7 @@ def get_following(user_id):
     user_to_check = User.query.filter_by(id=user_id).first()
     if user_to_check is None:
         return jsonify({'message': 'Faulty login'}), 404
-    return jsonify([u for u in user_to_check.follows]), 200
+    return [u for u in user_to_check.follows], 200
 
 
 @app.route('/event/create', methods=['POST'])
@@ -261,6 +261,16 @@ def uncomment_event(comment_id):
 def get_events():
     """Get all events."""
     events = Event.query.all()
+    return jsonify([event.to_dict() for event in events]), 200
+
+@app.route('/user/get_following/get_events', methods=['GET'])
+@jwt_required()
+def get_events_from_following():
+    """Get all events from all users the current user follows."""
+    current_user_id = get_jwt_identity()
+    events = []
+    for user in get_following(current_user_id):
+        events += user.created_events
     return jsonify([event.to_dict() for event in events]), 200
 
 
