@@ -54,8 +54,6 @@
                 android:id="@+id/numberoffollowing"
                 android:text="Following: 17"
                 />
-
-
         </LinearLayout>
 
         <Button
@@ -68,20 +66,58 @@
             android:layout_centerInParent="true"
             />
 
-
     </RelativeLayout>
-        <TextView
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        >
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Followers"
+            android:orientation="vertical"
+            ><TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Followers"
+                android:layout_marginVertical="20dp"
+                />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/groups"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginTop="20dp"
+                android:scrollbars = "vertical"
+                />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginStart="50dp"
+            ><TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Following"
             android:layout_marginVertical="20dp"
             />
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/groups"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/followinggroups"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginTop="20dp"
+                android:scrollbars = "vertical"
+                />
+        </LinearLayout>
+
+        <TableLayout
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginTop="20dp"
-            android:scrollbars = "vertical"
-            />
+            android:layout_height="wrap_content">
+
+        </TableLayout>
+    </LinearLayout>
+
 </LinearLayout>
 

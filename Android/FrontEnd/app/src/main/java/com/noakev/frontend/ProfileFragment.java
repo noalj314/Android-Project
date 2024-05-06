@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -34,10 +35,16 @@ import com.noakev.frontend.databinding.FragmentProfileBinding;
  */
 public class ProfileFragment extends Fragment implements ClickListener {
     private static final int REQUEST_CODE = 22;
-    private String currentProfile;
+    private String currentUser;
+    private String amountOfFollowers;
+    private String amountOfFollowing;
+    private TextView usernameTv;
+    private TextView followersTv;
+    private TextView followingTv;
     private FragmentProfileBinding binding;
-    private RecyclerView recyclerView;
-    private Groups groups;
+    private RecyclerView followerRv;
+    private RecyclerView followingRv;
+    private Groups followerGroups;
     private Adapter adapter;
     private ImageView selfieHolder;
     public interface DataFetchedCallback {
@@ -54,18 +61,24 @@ public class ProfileFragment extends Fragment implements ClickListener {
                              Bundle savedInstanceState) {
         binding = FragmentProfileBinding.inflate(getLayoutInflater(), container, false);
 
-        recyclerView = binding.groups;
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        followerRv = binding.groups;
+        followingRv = binding.followinggroups;
+        followerRv.setHasFixedSize(true);
+        followingRv.setHasFixedSize(true);
+        followerRv.setLayoutManager(new LinearLayoutManager(getContext()));
+        followingRv.setLayoutManager(new LinearLayoutManager(getContext()));
 
         adapter = new Adapter();
         adapter.setListener(ProfileFragment.this);
 
-        recyclerView.setAdapter(adapter);
+        followerRv.setAdapter(adapter);
 
         getDataVolley("https://brave-mud-8154b800471f41b1bbae6eea8237e22e.azurewebsites.net/grupper", () -> {
-            adapter.setData(groups.getUsers());
+            adapter.setData(followerGroups.getUsers());
+            followersTv = binding.numberoffollowers;
+            followersTv.setText("Followers: " + String.valueOf(adapter.getItemCount()));
         });
+
 
         selfieHolder = binding.selfieholder;
         Button selfieBtn = binding.selfiebutton;
@@ -87,7 +100,7 @@ public class ProfileFragment extends Fragment implements ClickListener {
                     public void onResponse(String response) {
                         // Display the response string.
                         Gson gson = new Gson();
-                        groups = gson.fromJson(response, Groups.class);
+                        followerGroups = gson.fromJson(response, Groups.class);
                         callback.onDataFetched();
                     }
                 }, new Response.ErrorListener() {
