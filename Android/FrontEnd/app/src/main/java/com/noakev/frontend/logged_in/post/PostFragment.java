@@ -1,9 +1,13 @@
 package com.noakev.frontend.logged_in.post;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -12,15 +16,20 @@ import android.location.LocationManager;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.noakev.frontend.databinding.FragmentPostBinding;
 
@@ -31,14 +40,12 @@ import java.util.Locale;
 /**
  */
 public class PostFragment extends Fragment {
+    private static final int REQUEST_CODE = 22;
     private FragmentPostBinding binding;
-    private Button locationBtn;
     private Button postBtn;
     private LocationManager locationManager;
     private LocationListener locationListener;
-    private TextView title;
-    private TextView password;
-    private String currentAddress = null;
+    private String currentAddress;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,11 +56,16 @@ public class PostFragment extends Fragment {
                              Bundle savedInstanceState) {
         binding = FragmentPostBinding.inflate(getLayoutInflater(), container, false);
 
-        title = binding.usernametext;
-        password = binding.passwordtext;
-        locationBtn = binding.locationbtn;
+        Button selfieBtn = binding.selfiebutton;
+        Button locationBtn = binding.locationbtn;
         postBtn = binding.postbtn;
 
+        //binding.publisher.setText(getCurrentUser);
+        selfieBtn.setOnClickListener(v -> {
+            Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            startActivityForResult(cameraIntent, REQUEST_CODE);
+
+        });
         locationBtn.setOnClickListener(v -> askForLocation());
         //postBtn.setOnClickListener(v -> createNewPost());
 
@@ -63,6 +75,7 @@ public class PostFragment extends Fragment {
     private void createNewPost() {
         //Post post = new Post(title.getText(), password.getText(), currentAddress);
     }
+
 
     private void askForLocation() {
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
@@ -77,6 +90,7 @@ public class PostFragment extends Fragment {
                     if (addressList != null && !addressList.isEmpty()) {
                         Address address = addressList.get(0);
                         currentAddress = address.getAddressLine(0);
+                        binding.location.setText(currentAddress);
                     }
                 }
                 catch (IOException e) {
@@ -97,6 +111,17 @@ public class PostFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
+            Bitmap photo = (Bitmap) data.getExtras().get("data");
+            binding.selfieholder.setImageBitmap(photo);
+        } else {
+            Toast.makeText(getContext(), "Cancelled", Toast.LENGTH_SHORT).show();
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
     @SuppressLint("MissingPermission")
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -109,4 +134,6 @@ public class PostFragment extends Fragment {
             }
         }
     }
+
+
 }

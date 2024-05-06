@@ -12,54 +12,63 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:gravity="center"
+            >
 
             <ImageView
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_margin="10dp"
                 android:id="@+id/image_profile"
                 android:src="@drawable/user"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/username"
+                android:id="@+id/publisher"
                 android:text="username"
-                android:layout_gravity="center_vertical"
                 android:textStyle="bold"
                 android:textColor="@color/cardview_dark_background"
                 android:textSize="16dp"/>
 
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="90pt">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:id="@+id/like"
+                    android:src="@drawable/heartunliked"
+                    android:layout_marginRight="15dp"/>
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:id="@+id/comment"
+                    android:src="@drawable/comment"
+                    android:layout_toEndOf="@id/like"/>
+            </LinearLayout>
+
         </LinearLayout>
 
-        <TextView
+        <ImageView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/posttext"
-            android:text="POST"
-            android:textSize="50dp"
-            android:textStyle="italic"/>
+            android:id="@+id/postimage"/>
 
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_toEndOf="@id/postimage"
+            android:src="@drawable/heartunliked"
+            />
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="8dp">
-
-            <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:id="@+id/like"
-                android:src="@drawable/heartunliked"/>
-
-            <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:id="@+id/comment"
-                android:src="@drawable/comment"
-                android:layout_toEndOf="@id/like"
-                android:layout_marginStart="10dp"/>
 
         </RelativeLayout>
 
@@ -68,17 +77,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:textStyle="bold"
-        android:id="@+id/likes"
-        android:text="10 likes"
-        android:textColor="@color/black"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:textStyle="bold"
-        android:id="@+id/publisher"
-        android:text="username"
+        android:id="@+id/location"
+        android:text="Linköping, Sverige 25 123"
         android:textColor="@color/black"/>
 
     <TextView

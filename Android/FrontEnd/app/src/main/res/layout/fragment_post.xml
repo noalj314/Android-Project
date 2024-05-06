@@ -15,68 +15,144 @@
             android:background="#10ffffff"
             android:textSize="35dp"
             android:textStyle="bold"
-            android:layout_margin="50dp"
             android:gravity="center"
             />
 
-        <EditText
-            android:id="@+id/usernametext"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/signintext"
-            android:textStyle="bold"
-            android:background="#50ffffff"
-            android:hint="Type an imagetext..."
-            android:textColorHint="@color/black"
-            android:textColor="@color/black"
-            android:layout_margin="10dp"
-            android:padding="20dp"
-            />
+            android:id="@+id/item"
+            android:orientation="vertical">
 
-        <EditText
-            android:id="@+id/passwordtext"
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    >
+
+                        <ImageView
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:id="@+id/image_profile"
+                            android:src="@drawable/user"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/publisher"
+                            android:text="username"
+                            android:textStyle="bold"
+                            android:textColor="@color/cardview_dark_background"
+                            android:textSize="16dp"/>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="90pt">
+
+                                <ImageView
+                                    android:layout_width="30dp"
+                                    android:layout_height="30dp"
+                                    android:id="@+id/like"
+                                    android:src="@drawable/heartunliked"
+                                    android:layout_marginRight="15dp"/>
+
+                                <ImageView
+                                    android:layout_width="30dp"
+                                    android:layout_height="30dp"
+                                    android:id="@+id/comment"
+                                    android:src="@drawable/comment"
+                                    android:layout_toEndOf="@id/like"/>
+                        </LinearLayout>
+
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/postimage"/>
+
+                <ImageView
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_below="@id/description"
+                    android:id="@+id/selfieholder"
+                    android:backgroundTint="#20BFD3"
+                    android:layout_centerHorizontal="true"
+                    android:layout_margin="10dp"
+                    />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp">
+
+                </RelativeLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:textStyle="bold"
+                    android:text="Sverige"
+                    android:id="@+id/location"
+                    android:textSize="17dp"
+                    android:textColor="@color/black"/>
+
+                <EditText
+                    android:id="@+id/description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:hint="Type a description..."
+                    android:textColorHint="@color/black"
+                    android:textColor="@color/black"
+                    android:layout_marginStart="8dp"
+                    />
+
+        </LinearLayout>
+
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/usernametext"
-            android:textStyle="bold"
-            android:background="#50ffffff"
-            android:hint="Password"
-            android:textColorHint="@color/black"
-            android:textColor="@color/black"
-            android:layout_margin="10dp"
-            android:padding="20dp"
-            />
+            android:layout_below="@id/item"
+            android:orientation="vertical"
+            android:id="@+id/postholder">
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/locationbtn"
-            android:layout_below="@id/passwordtext"
-            android:text="Add Location"
-            android:backgroundTint="#20BFD3"
-            android:layout_centerHorizontal="true"
-            android:layout_margin="20dp"
-            />
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/selfiebutton"
+                    android:layout_below="@id/selfieholder"
+                    android:text="Take a selfie"
+                    android:backgroundTint="#20BFD3"
+                    android:layout_centerHorizontal="true"
+                    android:layout_margin="5dp"
+                    />
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/postbtn"
-            android:layout_below="@id/locationbtn"
-            android:text="post"
-            android:backgroundTint="#20BFD3"
-            android:layout_centerHorizontal="true"
-            android:layout_margin="20dp"
-            />
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/locationbtn"
+                    android:layout_below="@id/selfiebutton"
+                    android:text="Add Location"
+                    android:backgroundTint="#20BFD3"
+                    android:layout_centerHorizontal="true"
+                    android:layout_margin="5dp"
+                    />
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Post Fragment"
-        android:textSize="30sp"
-        android:layout_below="@id/loginbtn"
-        android:layout_centerHorizontal="true"
-        android:textColor="@color/lavender"/>
-
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/postbtn"
+                    android:layout_below="@id/locationbtn"
+                    android:text="post"
+                    android:backgroundTint="#20BFD3"
+                    android:layout_centerHorizontal="true"
+                    android:layout_margin="5dp"
+                    />
+        </LinearLayout>
 </RelativeLayout>
