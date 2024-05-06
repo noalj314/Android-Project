@@ -46,7 +46,6 @@ class User(db.Model):
     created_events = db.relationship('Event', backref="user", lazy='dynamic')
     comments = db.relationship('Comment', backref='user', lazy='dynamic')
 
-
     followed_events = db.relationship('Event', secondary=event_followed,
                                       back_populates="event_followed_by", lazy='dynamic')
 
@@ -85,7 +84,7 @@ class Event(db.Model):
     date = db.Column(db.String, nullable=False)
     description = db.Column(db.String(200), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-
+    photo = db.Column(db.String(200), nullable=True)  # no default
 
     # Relationships
 

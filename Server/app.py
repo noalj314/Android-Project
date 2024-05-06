@@ -136,10 +136,8 @@ def find_user_by_username(username):
 
 
 @app.route('/user/get_followers/<user_id>', methods=['GET'])
-@jwt_required()
 def get_followers(user_id):
     """Get all followers of a user."""
-    user_to_check = User.query.filter_by(id=user_id).first()
     user_to_check = User.query.filter_by(id=user_id).first()
     if user_to_check is None:
         return jsonify({'message': 'Faulty login'}), 404
