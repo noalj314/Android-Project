@@ -24,8 +24,6 @@ import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
@@ -45,10 +43,13 @@ public class ProfileFragment extends Fragment implements ClickListener {
     private RecyclerView followerRv;
     private RecyclerView followingRv;
     private Groups followerGroups;
-    private Adapter adapter;
+    private Groups followingGroups;
+    private Adapter followersAdapter;
+    private Adapter followingAdapter;
     private ImageView selfieHolder;
+    private int a = 0;
     public interface DataFetchedCallback {
-        void onDataFetched();
+        void onDataFetched(Groups groups);
     }
 
     @Override
@@ -62,23 +63,32 @@ public class ProfileFragment extends Fragment implements ClickListener {
         binding = FragmentProfileBinding.inflate(getLayoutInflater(), container, false);
 
         followerRv = binding.groups;
-        followingRv = binding.followinggroups;
         followerRv.setHasFixedSize(true);
-        followingRv.setHasFixedSize(true);
         followerRv.setLayoutManager(new LinearLayoutManager(getContext()));
+        followersAdapter = new Adapter();
+        followersAdapter.setListener(ProfileFragment.this);
+        followerRv.setAdapter(followersAdapter);
+
+        followingRv = binding.followinggroups;
+        followingRv.setHasFixedSize(true);
         followingRv.setLayoutManager(new LinearLayoutManager(getContext()));
+        followingAdapter = new Adapter();
+        followingAdapter.setListener(ProfileFragment.this);
+        followingRv.setAdapter(followingAdapter);
 
-        adapter = new Adapter();
-        adapter.setListener(ProfileFragment.this);
-
-        followerRv.setAdapter(adapter);
-
-        getDataVolley("https://brave-mud-8154b800471f41b1bbae6eea8237e22e.azurewebsites.net/grupper", () -> {
-            adapter.setData(followerGroups.getUsers());
+        getDataVolley("https://brave-mud-8154b800471f41b1bbae6eea8237e22e.azurewebsites.net/grupper", (groups) -> {
+            followerGroups = groups;
+            followersAdapter.setData(followerGroups.getUsers());
             followersTv = binding.numberoffollowers;
-            followersTv.setText("Followers: " + String.valueOf(adapter.getItemCount()));
+            followersTv.setText("Followers: " + String.valueOf(followersAdapter.getItemCount()));
         });
 
+        getDataVolley("https://brave-mud-8154b800471f41b1bbae6eea8237e22e.azurewebsites.net/grupper", (groups) -> {
+            followingGroups = groups;
+            followingAdapter.setData(followingGroups.getUsers());
+            followingTv = binding.numberoffollowing;
+            followingTv.setText("Following: " + String.valueOf(followingAdapter.getItemCount()));
+        });
 
         selfieHolder = binding.selfieholder;
         Button selfieBtn = binding.selfiebutton;
@@ -95,21 +105,14 @@ public class ProfileFragment extends Fragment implements ClickListener {
 
         // Request a string response from the provided URL.
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        // Display the response string.
-                        Gson gson = new Gson();
-                        followerGroups = gson.fromJson(response, Groups.class);
-                        callback.onDataFetched();
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("Network", error.getMessage());
-            }
-        });
-        //  d the request to the RequestQueue.
+                response -> {
+                    // Display the response string.
+                    Gson gson = new Gson();
+                    Groups groups = gson.fromJson(response, Groups.class);
+                    callback.onDataFetched(groups);
+                },
+                error -> Log.e("Network", error.getMessage())
+        );
         queue.add(stringRequest);
     }
 
