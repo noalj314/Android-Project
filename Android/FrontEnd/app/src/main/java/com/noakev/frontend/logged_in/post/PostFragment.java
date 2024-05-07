@@ -10,7 +10,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.location.Address;
 import android.location.Geocoder;
-import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -22,17 +21,18 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.provider.MediaStore;
+import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.noakev.frontend.databinding.FragmentPostBinding;
+import com.noakev.frontend.logged_out.LogInActivity;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
@@ -46,6 +46,7 @@ public class PostFragment extends Fragment {
     private LocationManager locationManager;
     private LocationListener locationListener;
     private String currentAddress;
+    private Bitmap photo;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,44 +59,61 @@ public class PostFragment extends Fragment {
 
         Button selfieBtn = binding.selfiebutton;
         Button locationBtn = binding.locationbtn;
-        postBtn = binding.postbtn;
+        Button postBtn = binding.postbtn;
 
-        //binding.publisher.setText(getCurrentUser);
+        // Logik för att hämta användare
+        // binding.publisher.setText(getCurrentUser);
         selfieBtn.setOnClickListener(v -> {
             Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             startActivityForResult(cameraIntent, REQUEST_CODE);
 
         });
         locationBtn.setOnClickListener(v -> askForLocation());
-        //postBtn.setOnClickListener(v -> createNewPost());
+        postBtn.setOnClickListener(v -> createNewPost());
 
         return binding.getRoot();
     }
 
     private void createNewPost() {
-        //Post post = new Post(title.getText(), password.getText(), currentAddress);
+        if (allColumnsAreFilled()) {
+            Post post = new Post(String.valueOf(binding.description.getText()), currentAddress, getImageAsString());
+            Toast.makeText(getContext(), "Creating post...", Toast.LENGTH_SHORT).show();
+            // Save to database
+        } else {
+            Toast.makeText(getContext(), "Insufficient information!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private boolean allColumnsAreFilled() {
+        if (String.valueOf(binding.description.getText()).isEmpty()) {
+            Log.v("a", "a");
+            return false;
+        } else if (String.valueOf(binding.location.getText()).isEmpty()) {
+            Log.v("b", "b");
+            return false;
+        } else if (getImageAsString().isEmpty()) {
+            Log.v("c", "c");
+            return false;
+        }
+        return true;
     }
 
 
     private void askForLocation() {
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-        locationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(@NonNull Location location) {
-                double longitude = location.getLongitude();
-                double latitude = location.getLatitude();
-                Geocoder geocoder = new Geocoder(getActivity(), Locale.getDefault());
-                try {
-                    List<Address> addressList = geocoder.getFromLocation(latitude, longitude, 1);
-                    if (addressList != null && !addressList.isEmpty()) {
-                        Address address = addressList.get(0);
-                        currentAddress = address.getAddressLine(0);
-                        binding.location.setText(currentAddress);
-                    }
+        locationListener = location -> {
+            double longitude = location.getLongitude();
+            double latitude = location.getLatitude();
+            Geocoder geocoder = new Geocoder(getActivity(), Locale.getDefault());
+            try {
+                List<Address> addressList = geocoder.getFromLocation(latitude, longitude, 1);
+                if (addressList != null && !addressList.isEmpty()) {
+                    Address address = addressList.get(0);
+                    currentAddress = address.getAddressLine(0);
                 }
-                catch (IOException e) {
-                    e.printStackTrace();
-                }
+            }
+            catch (IOException e) {
+                e.printStackTrace();
             }
         };
         if (ContextCompat.checkSelfPermission(
@@ -109,12 +127,13 @@ public class PostFragment extends Fragment {
                     LocationManager.GPS_PROVIDER, 0, 0,
                     locationListener);
         }
+        binding.location.setText(currentAddress);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
-            Bitmap photo = (Bitmap) data.getExtras().get("data");
+            photo = (Bitmap) data.getExtras().get("data");
             binding.selfieholder.setImageBitmap(photo);
         } else {
             Toast.makeText(getContext(), "Cancelled", Toast.LENGTH_SHORT).show();
@@ -135,5 +154,20 @@ public class PostFragment extends Fragment {
         }
     }
 
+    private String getImageAsString() {
+        // give your image file url in mCurrentPhotoPath
+        byte[] byteArray = new byte[0];
+        try {
+            Bitmap bitmap = photo;
 
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            // In case you want to compress your image, here it's at 40%
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 40, byteArrayOutputStream);
+            byteArray = byteArrayOutputStream.toByteArray();
+        } catch (NullPointerException e) {
+            Log.e("There is no image", "Take a selfie");
+        }
+
+        return Base64.encodeToString(byteArray, Base64.DEFAULT);
+    }
 }

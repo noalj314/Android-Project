@@ -1,27 +1,25 @@
 package com.noakev.frontend.logged_in.post;
 
 public class Post {
-    private String postid;
     private String postimage;
+    private String location;
     private String description;
-    private String publisher;
 
-    public Post(String postid, String postimage, String description, String publisher) {
-        this.postid = postid;
+    public Post(String postimage, String location, String description) {
         this.postimage = postimage;
+        this.location = location;
         this.description = description;
-        this.publisher = publisher;
     }
 
     public Post() {
     }
 
-    public String getPostid() {
-        return postid;
+    public String getLocation() {
+        return location;
     }
 
-    public void setPostid(String postid) {
-        this.postid = postid;
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     public String getPostimage() {
@@ -38,13 +36,5 @@ public class Post {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getPublisher() {
-        return publisher;
-    }
-
-    public void setPublisher(String publisher) {
-        this.publisher = publisher;
     }
 }
