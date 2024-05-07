@@ -22,6 +22,9 @@
         <action
             android:id="@+id/action_homeFragment_to_otherProfilesFragment"
             app:destination="@id/otherProfilesFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_logInActivity"
+            app:destination="@id/logInActivity" />
     </fragment>
     <fragment
         android:id="@+id/profileFragment"
@@ -37,6 +40,9 @@
         <action
             android:id="@+id/action_profileFragment_to_otherProfilesFragment"
             app:destination="@id/otherProfilesFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_logInActivity"
+            app:destination="@id/logInActivity" />
     </fragment>
     <fragment
         android:id="@+id/postFragment"
@@ -49,6 +55,9 @@
         <action
             android:id="@+id/action_postFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
+        <action
+            android:id="@+id/action_postFragment_to_logInActivity"
+            app:destination="@id/logInActivity" />
     </fragment>
     <fragment
         android:id="@+id/otherProfilesFragment"
@@ -57,12 +66,12 @@
         tools:layout="@layout/fragment_other_profiles" >
         <action
             android:id="@+id/action_otherProfilesFragment_to_homeFragment"
-            app:destination="@id/otherProfilesFragment" />
-        <action
-            android:id="@+id/action_otherProfilesFragment_to_postFragment"
-            app:destination="@id/otherProfilesFragment" />
-        <action
-            android:id="@+id/action_otherProfilesFragment_to_profileFragment"
-            app:destination="@id/otherProfilesFragment" />
+            app:destination="@id/homeFragment" />
     </fragment>
+    <activity
+        android:id="@+id/logInActivity"
+        android:name="com.noakev.frontend.logged_out.LogInActivity"
+        android:label="activity_login"
+        tools:layout="@layout/activity_login" >
+    </activity>
 </navigation>
