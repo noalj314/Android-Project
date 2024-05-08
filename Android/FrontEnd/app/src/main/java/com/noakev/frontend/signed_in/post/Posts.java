@@ -1,6 +1,6 @@
-package com.noakev.frontend.logged_in.post;
+package com.noakev.frontend.signed_in.post;
 
-import com.noakev.frontend.logged_in.profile.User;
+import com.noakev.frontend.signed_in.profile.User;
 
 import java.util.ArrayList;
 

@@ -1,0 +1,46 @@
+package com.noakev.frontend.signed_out;
+
+import android.os.Bundle;
+
+import androidx.fragment.app.Fragment;
+
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.noakev.frontend.R;
+import com.noakev.frontend.databinding.FragmentSignInBinding;
+
+
+public class SignInFragment extends Fragment {
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        FragmentSignInBinding binding = FragmentSignInBinding.inflate(getLayoutInflater(), container, false);
+
+        TextView username = (TextView) binding.usernametext;
+        TextView password = (TextView) binding.passwordtext;
+
+        Button loginbtn = binding.loginbtn;
+        loginbtn.setOnClickListener(v -> {
+            if (username.getText().toString().equals("admin") && password.getText().toString().equals("admin")) {
+                Toast.makeText(getContext(), "LOGIN SUCCESSFUL", Toast.LENGTH_SHORT).show();
+                SignedOutActivity mainActivity = (SignedOutActivity)(getActivity());
+                mainActivity.navigateHome();
+            } else {
+                Toast.makeText(getContext(), "LOGIN FAILED!!!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        Button register = binding.register;
+        register.setOnClickListener(v -> {
+            SignedOutActivity mainActivity = (SignedOutActivity)(getActivity());
+            mainActivity.navigateToRegistration();
+        });
+
+        return binding.getRoot();
+    }
+}

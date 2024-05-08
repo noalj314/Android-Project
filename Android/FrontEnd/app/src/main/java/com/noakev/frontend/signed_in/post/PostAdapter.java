@@ -1,4 +1,4 @@
-package com.noakev.frontend.logged_in.post;
+package com.noakev.frontend.signed_in.post;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,7 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.noakev.frontend.logged_in.profile.ClickListener;
+import com.noakev.frontend.signed_in.profile.ClickListener;
 import com.noakev.frontend.R;
 
 import java.util.ArrayList;

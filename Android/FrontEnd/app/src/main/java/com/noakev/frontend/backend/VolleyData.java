@@ -6,8 +6,8 @@ import com.android.volley.Request;
 import com.android.volley.toolbox.StringRequest;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.noakev.frontend.logged_in.profile.ProfileFragment;
-import com.noakev.frontend.logged_in.profile.Groups;
+import com.noakev.frontend.signed_in.profile.ProfileFragment;
+import com.noakev.frontend.signed_in.profile.Groups;
 
 public class VolleyData {
     public void sendVolleyRequest(String route, JsonObject jsonObject) {

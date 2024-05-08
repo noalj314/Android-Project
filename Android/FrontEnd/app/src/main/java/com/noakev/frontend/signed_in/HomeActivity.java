@@ -1,4 +1,4 @@
-package com.noakev.frontend.logged_in;
+package com.noakev.frontend.signed_in;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,8 +16,6 @@ import com.noakev.frontend.R;
 
 public class HomeActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
-    private NavigationView navigationView;
-    private NavController navController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,8 +26,8 @@ public class HomeActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         drawerLayout = findViewById(R.id.drawer_layout);
-        navigationView = findViewById(R.id.nav_view);
-        navController = Navigation.findNavController(this, R.id.fragment_container);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        NavController navController = Navigation.findNavController(this, R.id.fragment_container);
         NavigationUI.setupWithNavController(navigationView, navController);
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open_nav,

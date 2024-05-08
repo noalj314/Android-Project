@@ -1,4 +1,4 @@
-package com.noakev.frontend.logged_in.post;
+package com.noakev.frontend.signed_in.post;
 
 public class Post {
     private String postimage;

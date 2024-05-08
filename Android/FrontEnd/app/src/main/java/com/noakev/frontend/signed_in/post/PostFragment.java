@@ -1,4 +1,4 @@
-package com.noakev.frontend.logged_in.post;
+package com.noakev.frontend.signed_in.post;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -30,7 +30,6 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.noakev.frontend.databinding.FragmentPostBinding;
-import com.noakev.frontend.logged_out.LogInActivity;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -76,7 +75,8 @@ public class PostFragment extends Fragment {
 
     private void createNewPost() {
         if (allColumnsAreFilled()) {
-            Post post = new Post(String.valueOf(binding.description.getText()), currentAddress, getImageAsString());
+            //Post post = new Post(String.valueOf(binding.description.getText()), currentAddress, getImageAsString());
+
             Toast.makeText(getContext(), "Creating post...", Toast.LENGTH_SHORT).show();
             // Save to database
         } else {

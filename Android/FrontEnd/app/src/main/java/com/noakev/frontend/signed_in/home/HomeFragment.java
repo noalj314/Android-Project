@@ -1,4 +1,4 @@
-package com.noakev.frontend.logged_in.home;
+package com.noakev.frontend.signed_in.home;
 
 import android.os.Bundle;
 
@@ -10,8 +10,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.noakev.frontend.logged_in.post.PostAdapter;
-import com.noakev.frontend.logged_in.profile.Groups;
+import com.noakev.frontend.signed_in.post.PostAdapter;
+import com.noakev.frontend.signed_in.profile.Groups;
 import com.noakev.frontend.databinding.FragmentHomeBinding;
 
 import java.util.ArrayList;

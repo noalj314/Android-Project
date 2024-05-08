@@ -2,11 +2,10 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#E8EFD1"
-    tools:context=".logged_out.LogInActivity">
+    tools:context=".signed_out.SignInFragment">
 
     <TextView
         android:id="@+id/signintext"
@@ -67,36 +66,23 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/forgotpass"
+        android:id="@+id/donthaveuser"
         android:layout_below="@id/loginbtn"
-        android:text="Forgot Password?"
+        android:text="Don't have a user yet?"
         android:textColor="@color/black"
         android:layout_centerHorizontal="true"
         android:layout_margin="20dp"
         />
 
-    <TextView
+    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/others"
-        android:layout_above="@id/socialicons"
-        android:text="or sign in with"
+        android:id="@+id/register"
+        android:layout_below="@id/donthaveuser"
+        android:text="Resgister"
+        android:backgroundTint="#20BFD3"
         android:layout_centerHorizontal="true"
+        android:layout_margin="20dp"
         />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/socialicons"
-        android:layout_alignParentBottom="true"
-        android:layout_margin="30dp"
-        android:gravity="center">
-
-        <ImageView
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/google"
-            />
-    </LinearLayout>
 
 </RelativeLayout>
