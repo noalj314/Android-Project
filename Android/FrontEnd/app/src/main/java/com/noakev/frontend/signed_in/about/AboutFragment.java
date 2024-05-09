@@ -1,4 +1,4 @@
-package com.noakev.frontend.logged_in.about;
+package com.noakev.frontend.signed_in.about;
 
 import android.os.Bundle;
 

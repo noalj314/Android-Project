@@ -1,4 +1,4 @@
-package com.noakev.frontend.logged_in.profile;
+package com.noakev.frontend.signed_in.profile;
 
 import static android.app.Activity.RESULT_OK;
 

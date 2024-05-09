@@ -11,6 +11,9 @@
       <entry key="LogInActivity">
         <State />
       </entry>
+      <entry key="SignedOutActivity">
+        <State />
+      </entry>
     </value>
   </component>
 </project>
