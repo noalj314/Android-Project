@@ -8,28 +8,10 @@ from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
 from database import *
 import requests
-from google.oauth2 import id_token
-from google.auth.transport import requests
-
-from authlib.integrations.flask_client import OAuth
 
 app.config['JWT_SECRET_KEY'] = "London calling to the faraway towns..."
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
-
-oauth = OAuth(app)
-google = oauth.register(
-    name='google',
-    client_id="637976557829-ki6fc4ubhd3pn9d5mpcrn9mu77unqm89.apps.googleusercontent.com",
-    client_secret="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",
-    access_token_url='https://accounts.google.com/o/oauth2/token',
-    access_token_params=None,
-    authorize_url='https://accounts.google.com/o/oauth2/auth',
-    authorize_params=None,
-    api_base_url='https://www.googleapis.com/oauth2/v1/',
-    userinfo_endpoint='https://www.googleapis.com/oauth2/v1/userinfo',
-    client_kwargs={'scope': 'openid profile email'},
-)
 
 
 @jwt.token_in_blocklist_loader
@@ -40,42 +22,33 @@ def check_if_token_in_blocklist(jwt_header, jwt_payload):
     return token is not None
 
 
-@app.route('/')
-def homepage():
-    return '<a href="/login">Login with Google</a>'
+@app.route('/user/create', methods=['POST'])
+def create_user():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+    u = User.query.filter_by(username=username).first()
+    if u is not None:
+        return jsonify({'status': 'fail', 'message': "username taken"}), 400
+    u = User(username=username, password=password)
+    db.session.add(u)
+    db.session.commit()
+    return "", 200
 
 
-@app.route('/user/login/', methods=['POST'])
-def login():
-    """ Authorize login with Google. Takes a idToken from Google and checks if correct.
-    We then check if we have a user in our database with the given username, if so login else create user.
-    Then returns a jwt token."""
-    json_input = request.get_json()
-    token = json_input["idToken"]
-
-    try:
-
-        google_request = requests.Request()
-        data = id_token.verify_oauth2_token(token, google_request, google)
-
-        if data['iss'] in ['accounts.google.com', 'https://accounts.google.com']:
-            username = data["sub"]
-            email = data["email"]
-            description = data["name"]
-
-            current_user = User.query.filter_by(username=username).first()
-            if current_user is None:
-                current_user = User(username=username, email=email, description=description)
-                db.session.add(current_user)
-                db.session.commit()
-
-            access_token = create_access_token(identity=current_user.id)
-            data = current_user.to_dict()
-            data['access_token'] = access_token
-            return jsonify(data), 200
-
-    except ValueError:
-        return jsonify({'message': 'Invalid token'}), 401
+@app.route('/user/login', methods=['POST'])
+def user_login():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+    u = User.query.filter_by(username=username).first()
+    if u is None:
+        return jsonify({'message': 'No such user or wrong password', 'status': 'fail'}), 400
+    if bcrypt.check_password_hash(u.password, password):
+        token = create_access_token(identity=username, expires_delta=datetime.timedelta(hours=1))
+        return jsonify({'token': token}), 200
+    else:
+        return jsonify({'message': 'No such user or wrong password', 'status': 'fail'}), 400
 
 
 @app.route('/user/logout', methods=['POST'])
@@ -144,6 +117,7 @@ def get_followers(user_id):
     return jsonify([u.username_to_dict() for u in user_to_check.followers]), 200
 
 
+@app.route('/user/get_following/<user_id>', methods=['GET'])
 def get_following(user_id):
     """Get all users that a user follows."""
     user_to_check = User.query.filter_by(id=user_id).first()
@@ -157,10 +131,9 @@ def get_following(user_id):
 def create_event():
     user_id = get_jwt_identity()
     event_data = request.get_json()
+    username = User.query.filter_by(id=user_id).first().username
     try:
-        event = Event(title=event_data['title'],
-                      description=event_data['description'],
-                      date=event_data['date'], location=event_data['location'], user_id=user_id)
+        event = Event(description=event_data['description'], location=event_data['location'], photo=event_data['photo'], user_id=user_id, username=username)
         db.session.add(event)
         User.query.filter_by(id=user_id).first().created_events.append(event)
 
@@ -168,6 +141,7 @@ def create_event():
         return jsonify({'message': 'Event created'}), 200
     except KeyError:
         return jsonify({'message': 'Missing required data'}), 400
+
 
 @app.route("/event/delete/<event_id>", methods=['POST'])
 @jwt_required()
@@ -260,6 +234,7 @@ def get_events():
     """Get all events."""
     events = Event.query.all()
     return jsonify([event.to_dict() for event in events]), 200
+
 
 @app.route('/user/get_following/get_events', methods=['GET'])
 @jwt_required()
