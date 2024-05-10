@@ -69,22 +69,15 @@ public class HomeFragment extends Fragment {
 
         // Request a string response from the provided URL.
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        // Display the response string.
-                        Gson gson = new Gson();
-                        events = gson.fromJson(response, Posts.class);
-                        callback.onDataFetched(events);
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("Network", error.getMessage());
-            }
-        });
-        //  d the request to the RequestQueue.
+                response -> {
+                    // Display the response string.
+                    Gson gson = new Gson();
+                    events = gson.fromJson(response, Posts.class);
+                    callback.onDataFetched(events);
+                }, error -> Log.e("Network", error.getMessage())
+        );
         queue.add(stringRequest);
     }
 }
+
 

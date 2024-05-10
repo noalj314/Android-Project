@@ -2,6 +2,8 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import os
 
+from flask_bcrypt import Bcrypt
+
 app = Flask(__name__)
 if "AZURE_POSTGRESQL_CONNECTIONSTRING" in os.environ:
     conn = os.environ["AZURE_POSTGRESQL_CONNECTIONSTRING"]
@@ -13,6 +15,7 @@ if "AZURE_POSTGRESQL_CONNECTIONSTRING" in os.environ:
     db_uri = f'postgresql+psycopg2://{user}:{password}@{host}/{database}'
 else:
     db_uri = 'sqlite:///.//our.db'
+bcrypt = Bcrypt(app)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
 
@@ -74,13 +77,18 @@ class User(db.Model):
             'username': self.username
         }
 
+    def __init__(self, username, password, description):
+        self.description = description
+        self.username = username
+        self.password = bcrypt.generate_password_hash(password).decode('utf-8')
+
 
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     location = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(200), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    photo = db.Column(db.String(200), nullable=True)  # no default
+    photo = db.Column(db.String(200), nullable=True, default=None)  # no default
     username = db.Column(db.String(20), nullable=False)
 
     # Relationships

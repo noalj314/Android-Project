@@ -29,7 +29,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
 import com.noakev.frontend.databinding.FragmentPostBinding;
+import com.noakev.frontend.signed_in.profile.Groups;
+import com.noakev.frontend.signed_in.profile.ProfileFragment;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -46,6 +53,9 @@ public class PostFragment extends Fragment {
     private LocationListener locationListener;
     private String currentAddress;
     private Bitmap photo;
+    public interface DataFetchedCallbackPost {
+        void onDataFetched();
+    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,8 +86,11 @@ public class PostFragment extends Fragment {
     private void createNewPost() {
         if (allColumnsAreFilled()) {
             //Post post = new Post(String.valueOf(binding.description.getText()), currentAddress, getImageAsString());
-
             Toast.makeText(getContext(), "Creating post...", Toast.LENGTH_SHORT).show();
+
+            getDataVolley("localhost:5000/event/create", () -> {
+
+            });
             // Save to database
         } else {
             Toast.makeText(getContext(), "Insufficient information!", Toast.LENGTH_SHORT).show();
@@ -98,6 +111,20 @@ public class PostFragment extends Fragment {
         return true;
     }
 
+    public void getDataVolley(String url, DataFetchedCallbackPost callback) {
+        // Instantiate the RequestQueue.
+        RequestQueue queue = Volley.newRequestQueue(getContext());
+
+        // Request a string response from the provided URL.
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                response -> {
+                    // Display the response string.
+                    callback.onDataFetched();
+                },
+                error -> Log.e("Network", error.getMessage())
+        );
+        queue.add(stringRequest);
+    }
 
     private void askForLocation() {
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
