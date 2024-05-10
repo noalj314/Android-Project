@@ -38,9 +38,8 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
     photo = db.Column(db.String(200), nullable=True)  # add default later
-    email = db.Column(db.String(120), unique=True, nullable=False)
     description = db.Column(db.String(200), nullable=False)
-
+    password = db.Column(db.String, nullable=False)
 
     # Relationships
     created_events = db.relationship('Event', backref="user", lazy='dynamic')
@@ -61,7 +60,6 @@ class User(db.Model):
                                 foreign_keys=[user_followed.c.followed_id, user_followed.c.follower_id],
                                 back_populates="follows", lazy='dynamic')
 
-
     def to_dict(self):
         return {
             'id': self.id,
@@ -79,12 +77,11 @@ class User(db.Model):
 
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    title = db.Column(db.String(100), nullable=False)
     location = db.Column(db.String(100), nullable=False)
-    date = db.Column(db.String, nullable=False)
     description = db.Column(db.String(200), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     photo = db.Column(db.String(200), nullable=True)  # no default
+    username = db.Column(db.String(20), nullable=False)
 
     # Relationships
 
@@ -92,6 +89,7 @@ class Event(db.Model):
 
     event_followed_by = db.relationship('User', secondary=event_followed,
                                         back_populates="followed_events", lazy='dynamic')
+
     def event_to_dict(self):
         return {
             'id': self.id,
@@ -108,8 +106,6 @@ class Comment(db.Model):
     text = db.Column(db.String(200), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
-
-
 
 
 class BlockedTokens(db.Model):

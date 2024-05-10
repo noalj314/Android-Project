@@ -1,15 +1,9 @@
-import datetime
 from unittest.mock import patch
 
 import pytest
 
 from app import *
 from google.oauth2 import id_token
-
-
-
-import uuid
-import os
 
 # Get the current directory
 
@@ -43,57 +37,48 @@ def client():
         with app.app_context():
             yield client  # testing happens here
 
+
+def create_user1(client):
+    """Create user 1"""
+    data = {
+        'username': 'user1',
+        'password': 'user1'
+    }
+    response = client.post('/user/create', json=data)
+    assert response.status_code == 200
+
+def create_user2(client):
+    """Create user 2"""
+    data = {
+        'username': 'user2',
+        'password': 'user2'
+    }
+    response = client.post('/user/create', json=data)
+    assert response.status_code == 200
+
 @pytest.fixture()
 def test_login(client):
-    """User will be created 1"""
-    # Mock the verify_oauth2_token function to return a specific result
-    with patch.object(id_token, 'verify_oauth2_token') as mock_verify:
-        # This is the result that verify_oauth2_token will return
-        mock_verify.return_value = {
-            'iss': 'accounts.google.com',
-            'sub': 'us1',
-            'email': 'test1@example.com',
-            'email_verified': True,
-            'name': '1',
-            'picture': 'http://example.com/image.jpg',
-            'given_name': '1',
-            'family_name': '1',
-            'locale': 'en'
-        }
-
-        # Now when you make a request with any idToken, it will be considered valid
-        response = client.post('/user/login/', json={'idToken': 'test'})
-        # Continue with your assertions
-        assert response.status_code == 200
-        jwt_token = response.json['access_token']
-
-    return jwt_token
+    """Test user login with correct credentials."""
+    # Then login
+    login_data = {
+        'username': 'user1',
+        'password': 'user1'
+    }
+    response = client.post('/user/login', json=login_data)
+    assert response.status_code == 200
+    assert 'token' in response.json
 
 @pytest.fixture()
 def test_login_user_2(client):
-    """create suer 2"""
-    # Mock the verify_oauth2_token function to return a specific result
-    with patch.object(id_token, 'verify_oauth2_token') as mock_verify:
-        # This is the result that verify_oauth2_token will return
-        mock_verify.return_value = {
-            'iss': 'accounts.google.com',
-            'sub': '2',
-            'email': 'test2@example.com',
-            'email_verified': True,
-            'name': 'user2',
-            'picture': 'http://example.com/image.jpg',
-            'given_name': '2',
-            'family_name': '2',
-            'locale': 'en'
-        }
-
-        # Now when you make a request with any idToken, it will be considered valid
-        response = client.post('/user/login/', json={'idToken': 'test2'})
-        # Continue with your assertions
-        assert response.status_code == 200
-        jwt_token = response.json['access_token']
-
-    return jwt_token
+    """Test user login with correct credentials."""
+    # Then login
+    login_data = {
+        'username': 'user2',
+        'password': 'user2'
+    }
+    response = client.post('/user/login', json=login_data)
+    assert response.status_code == 200
+    assert 'token' in response.json
 
 def test_follow(client, test_login, test_login_user_2):
     """Test if a user can follow another user. To test this be logged in as user 1."""
@@ -164,12 +149,6 @@ def test_get_followers(client, test_login, test_login_user_2):
     followers = response.json
     assert any(follower['username'] == '2' for follower in followers)
 
-
-def test_invalid_login(client):
-    # Attempt login with an invalid token
-    response = client.post('/user/login/', json={'idToken': 'invalid_token'})
-    assert response.status_code == 401
-    assert 'Invalid token' in response.json['message']
 
 
 def test_access_denied_without_jwt(client):

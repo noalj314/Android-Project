@@ -8,8 +8,8 @@ from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
 from database import *
 import requests
-#from google.oauth2 import id_token
-#from google.auth.transport import requests
+from google.oauth2 import id_token
+from google.auth.transport import requests
 
 from authlib.integrations.flask_client import OAuth
 
