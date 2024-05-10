@@ -8,8 +8,8 @@ from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
 from database import *
 import requests
-from google.oauth2 import id_token
-from google.auth.transport import requests
+#from google.oauth2 import id_token
+#from google.auth.transport import requests
 
 from authlib.integrations.flask_client import OAuth
 
@@ -159,8 +159,7 @@ def create_event():
     event_data = request.get_json()
     try:
         event = Event(title=event_data['title'],
-                      description=event_data['description'],
-                      date=event_data['date'], location=event_data['location'], user_id=user_id)
+                      description=event_data['description'],location=event_data['location'], user_id=user_id)
         db.session.add(event)
         User.query.filter_by(id=user_id).first().created_events.append(event)
 
@@ -259,7 +258,7 @@ def uncomment_event(comment_id):
 def get_events():
     """Get all events."""
     events = Event.query.all()
-    return jsonify([event.to_dict() for event in events]), 200
+    return jsonify({"events" : [event.to_dict() for event in events]}), 200
 
 @app.route('/user/get_following/get_events', methods=['GET'])
 @jwt_required()
@@ -269,8 +268,9 @@ def get_events_from_following():
     events = []
     for user in get_following(current_user_id):
         events += user.created_events
-    return jsonify([event.to_dict() for event in events]), 200
+    return jsonify({"events" : [event.to_dict() for event in events]}), 200
 
 
 if __name__ == '__main__':
     app.run(debug=True)
+        
