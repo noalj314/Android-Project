@@ -1,4 +1,4 @@
-from datetime import datetime
+import datetime
 
 from flask import request, jsonify
 from flask_jwt_extended import create_access_token
@@ -27,10 +27,11 @@ def create_user():
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
+    description = data.get('description')
     u = User.query.filter_by(username=username).first()
     if u is not None:
         return jsonify({'status': 'fail', 'message': "username taken"}), 400
-    u = User(username=username, password=password)
+    u = User(username=username, password=password, description=description)
     db.session.add(u)
     db.session.commit()
     return "", 200
@@ -45,8 +46,8 @@ def user_login():
     if u is None:
         return jsonify({'message': 'No such user or wrong password', 'status': 'fail'}), 400
     if bcrypt.check_password_hash(u.password, password):
-        token = create_access_token(identity=username, expires_delta=datetime.timedelta(hours=1))
-        return jsonify({'token': token}), 200
+        access_token = create_access_token(identity=u.id, expires_delta=datetime.timedelta(hours=1))
+        return jsonify({'token' : access_token}), 200
     else:
         return jsonify({'message': 'No such user or wrong password', 'status': 'fail'}), 400
 
@@ -66,8 +67,10 @@ def logout():
 def follow_user(username):
     """Follow a user that exists takes a username as argument. Requires a jwt token. """
     current_user_id = get_jwt_identity()
+    print(current_user_id)
     user_to_follow = User.query.filter_by(username=username).first()
     current_user = User.query.filter_by(id=current_user_id).first()
+    print(current_user)
     if user_to_follow is None:
         return jsonify({'message': 'No such user to follow'}), 404
     if current_user is None:
@@ -152,11 +155,11 @@ def delete_event(event_id):
     if event_to_delete is None:
         return jsonify({'message': 'No such event to delete'}), 404
 
-    user = User.query.filter_by(id=user_id).first()
-    if user is None:
+    u = User.query.filter_by(id=user_id).first()
+    if u is None:
         return jsonify({'message': 'No such user'}), 404
     db.session.delete(event_to_delete)
-    user.created_events.remove(event_to_delete)
+    u.created_events.remove(event_to_delete)
 
     db.session.commit()
     return jsonify({'message': 'Event deleted'}), 200
@@ -233,7 +236,7 @@ def uncomment_event(comment_id):
 def get_events():
     """Get all events."""
     events = Event.query.all()
-    return jsonify([event.to_dict() for event in events]), 200
+    return jsonify({"events" : [event.to_dict() for event in events]}), 200
 
 
 @app.route('/user/get_following/get_events', methods=['GET'])
@@ -242,8 +245,8 @@ def get_events_from_following():
     """Get all events from all users the current user follows."""
     current_user_id = get_jwt_identity()
     events = []
-    for user in get_following(current_user_id):
-        events += user.created_events
+    for u in get_following(current_user_id):
+        events += u.created_events
     return jsonify([event.to_dict() for event in events]), 200
 
 

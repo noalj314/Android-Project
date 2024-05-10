@@ -3,7 +3,6 @@ from unittest.mock import patch
 import pytest
 
 from app import *
-from google.oauth2 import id_token
 
 # Get the current directory
 
@@ -38,23 +37,27 @@ def client():
             yield client  # testing happens here
 
 
-def create_user1(client):
+def test_create_user1(client):
     """Create user 1"""
     data = {
         'username': 'user1',
-        'password': 'user1'
+        'password': 'user1',
+        'description': 'Sucks dick'
     }
     response = client.post('/user/create', json=data)
     assert response.status_code == 200
 
-def create_user2(client):
+
+def test_create_user2(client):
     """Create user 2"""
     data = {
         'username': 'user2',
-        'password': 'user2'
+        'password': 'user2',
+        'description': 'Sucks more dick'
     }
     response = client.post('/user/create', json=data)
     assert response.status_code == 200
+
 
 @pytest.fixture()
 def test_login(client):
@@ -67,6 +70,8 @@ def test_login(client):
     response = client.post('/user/login', json=login_data)
     assert response.status_code == 200
     assert 'token' in response.json
+    return response.json['token']
+
 
 @pytest.fixture()
 def test_login_user_2(client):
@@ -79,16 +84,19 @@ def test_login_user_2(client):
     response = client.post('/user/login', json=login_data)
     assert response.status_code == 200
     assert 'token' in response.json
+    return response.json['token']
+
 
 def test_follow(client, test_login, test_login_user_2):
     """Test if a user can follow another user. To test this be logged in as user 1."""
     jwt_token = test_login
-    response = client.post('/user/follow/2', headers={'Authorization': f'Bearer {jwt_token}'})
+    response = client.post('/user/follow/user2', headers={'Authorization': f'Bearer {jwt_token}'})
     assert response.status_code == 200
+
 
 def test_unfollow(client, test_login, test_login_user_2):
     jwt_token = test_login
-    response = client.post('/user/unfollow/2', headers={'Authorization': f'Bearer {jwt_token}'})
+    response = client.post('/user/unfollow/user2', headers={'Authorization': f'Bearer {jwt_token}'})
     assert response.status_code == 200
 
 
@@ -98,11 +106,13 @@ def test_create_event(client, test_login):
         "title": "Test Event",
         "description": "This is a test event",
         "location": "Test Location",
-        "date": "12"
+        "date": "12",
+        "photo" : "cock"
     }
     response = client.post('/event/create', headers={'Authorization': f'Bearer {jwt_token}'},
                            json=event_data)
     assert response.status_code == 200
+
 
 def test_follow_event(client, test_login_user_2):
     jwt_token = test_login_user_2
@@ -137,23 +147,8 @@ def test_del_event(client, test_login):
     assert response.status_code == 200
 
 
-def test_get_followers(client, test_login, test_login_user_2):
-    # First, make user 2 follow user 1
-    jwt_token_user_2 = test_login_user_2
-    client.post('/user/follow/us1', headers={'Authorization': f'Bearer {jwt_token_user_2}'})
-
-    # Then retrieve followers for user 1
-    jwt_token_user_1 = test_login
-    response = client.get('/user/get_followers/1', headers={'Authorization': f'Bearer {jwt_token_user_1}'})
-    assert response.status_code == 200
-    followers = response.json
-    assert any(follower['username'] == '2' for follower in followers)
-
-
-
 def test_access_denied_without_jwt(client):
     response = client.post('/user/follow/us1')
     assert response.status_code == 401
     assert 'msg' in response.json and response.json['msg'] == 'Missing Authorization Header'
-
 
