@@ -13,6 +13,9 @@ public class VolleyData {
     public void sendVolleyRequest(String route, JsonObject jsonObject) {
 
     }
+
+}
+/*
     public void getDataVolley(String url, ProfileFragment.DataFetchedCallback callback) {
         // Instantiate the RequestQueue.
         //RequestQueue queue = Volley.newRequestQueue(getContext());

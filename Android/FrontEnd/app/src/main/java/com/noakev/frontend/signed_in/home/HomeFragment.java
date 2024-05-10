@@ -6,13 +6,24 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
+import com.noakev.frontend.signed_in.post.Post;
 import com.noakev.frontend.signed_in.post.PostAdapter;
-import com.noakev.frontend.signed_in.profile.Groups;
+import com.noakev.frontend.signed_in.post.Posts;
 import com.noakev.frontend.databinding.FragmentHomeBinding;
+import com.noakev.frontend.signed_in.profile.Groups;
+import com.noakev.frontend.signed_in.profile.ProfileFragment;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,8 +32,11 @@ public class HomeFragment extends Fragment {
 
     private FragmentHomeBinding binding;
     private RecyclerView recyclerView;
-    private Groups groups;
+    private Posts events;
     private PostAdapter adapter;
+    public interface DataFetchedCallbackHome {
+        void onDataFetched(Posts events);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -31,32 +45,25 @@ public class HomeFragment extends Fragment {
 
         RecyclerView rv = binding.posts;
         ArrayList<HashMap> data = new ArrayList<>();
-        PostAdapter Newadapter = new PostAdapter();
+        PostAdapter postAdapter = new PostAdapter();
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
-        rv.setAdapter(Newadapter);
+        rv.setAdapter(postAdapter);
 
-        for (int x = 0; x<= 10; x++){
-            HashMap<String, String> deats = new HashMap<>();
-            deats.put("id", "dW"+x);
-            data.add(deats);
-        }
-        Newadapter.setLocalData(data);
-
-
-//        ArrayList<Integer> data = new ArrayList<>();
-//        recyclerView = binding.posts;
-//        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-//        adapter = new PostAdapter();
-//        recyclerView.setAdapter(adapter);
-
-
-        /*getDataVolley("https://brave-mud-8154b800471f41b1bbae6eea8237e22e.azurewebsites.net/grupper", () -> {
-            adapter.setData(groups.getUsers());
-        });*/
+        getDataVolley("http://localhost:5000/event/get_events/", (events) -> {
+            int i = 0;
+            for (Post post : events.getEvents()) {
+                HashMap<String, String> deats = new HashMap<>();
+                deats.put("id", "dW"+i);
+                data.add(deats);
+                i++;
+            }
+        });
+        postAdapter.setLocalData(data);
 
         return binding.getRoot();
     }
-/*    public void getDataVolley(String url, ProfileFragment.DataFetchedCallback callback) {
+
+    public void getDataVolley(String url, DataFetchedCallbackHome callback) {
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(getContext());
 
@@ -67,8 +74,8 @@ public class HomeFragment extends Fragment {
                     public void onResponse(String response) {
                         // Display the response string.
                         Gson gson = new Gson();
-                        groups = gson.fromJson(response, Groups.class);
-                        callback.onDataFetched();
+                        events = gson.fromJson(response, Posts.class);
+                        callback.onDataFetched(events);
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -78,5 +85,6 @@ public class HomeFragment extends Fragment {
         });
         //  d the request to the RequestQueue.
         queue.add(stringRequest);
-    }*/
+    }
 }
+

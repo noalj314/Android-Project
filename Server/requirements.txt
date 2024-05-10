@@ -16,3 +16,5 @@ urllib3
 Werkzeug
 zipp
 Authlib
+flask_jwt_extended
+flask_bcrypt
