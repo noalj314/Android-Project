@@ -27,6 +27,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
+import com.noakev.frontend.GlobalUser;
 import com.noakev.frontend.backend.VolleyData;
 import com.noakev.frontend.databinding.FragmentProfileBinding;
 
@@ -36,7 +37,7 @@ import org.json.JSONObject;
  */
 public class ProfileFragment extends Fragment implements ClickListener {
     private static final int REQUEST_CODE = 22;
-    private String currentUser;
+    private String currentUser = GlobalUser.getUsername();
     private TextView followersTv;
     private TextView followingTv;
     private FragmentProfileBinding binding;

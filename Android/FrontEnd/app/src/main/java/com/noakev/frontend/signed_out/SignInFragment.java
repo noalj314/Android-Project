@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.noakev.frontend.GlobalUser;
 import com.noakev.frontend.R;
 import com.noakev.frontend.databinding.FragmentSignInBinding;
 
@@ -27,9 +28,10 @@ public class SignInFragment extends Fragment {
         Button loginbtn = binding.loginbtn;
         loginbtn.setOnClickListener(v -> {
             if (username.getText().toString().equals("admin") && password.getText().toString().equals("admin")) {
-                Toast.makeText(getContext(), "LOGIN SUCCESSFUL", Toast.LENGTH_SHORT).show();
+                GlobalUser globalUser = new GlobalUser("abc", username.getText().toString());
                 SignedOutActivity mainActivity = (SignedOutActivity)(getActivity());
                 mainActivity.navigateHome();
+                Toast.makeText(getContext(), "LOGIN SUCCESSFUL", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(getContext(), "LOGIN FAILED!!!", Toast.LENGTH_SHORT).show();
             }

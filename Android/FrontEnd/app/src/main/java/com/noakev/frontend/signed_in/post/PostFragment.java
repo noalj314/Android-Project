@@ -27,6 +27,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -34,9 +35,12 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
+import com.noakev.frontend.GlobalUser;
 import com.noakev.frontend.databinding.FragmentPostBinding;
 import com.noakev.frontend.signed_in.profile.Groups;
 import com.noakev.frontend.signed_in.profile.ProfileFragment;
+
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -47,6 +51,7 @@ import java.util.Locale;
  */
 public class PostFragment extends Fragment {
     private static final int REQUEST_CODE = 22;
+    private JSONObject newPost;
     private FragmentPostBinding binding;
     private Button postBtn;
     private LocationManager locationManager;
@@ -66,9 +71,12 @@ public class PostFragment extends Fragment {
                              Bundle savedInstanceState) {
         binding = FragmentPostBinding.inflate(getLayoutInflater(), container, false);
 
+        TextView username = binding.publisher;
         Button selfieBtn = binding.selfiebutton;
         Button locationBtn = binding.locationbtn;
         Button postBtn = binding.postbtn;
+
+        username.setText(GlobalUser.getUsername());
 
         // Logik för att hämta användare
         // binding.publisher.setText(getCurrentUser);
@@ -87,6 +95,8 @@ public class PostFragment extends Fragment {
         if (allColumnsAreFilled()) {
             //Post post = new Post(String.valueOf(binding.description.getText()), currentAddress, getImageAsString());
             Toast.makeText(getContext(), "Creating post...", Toast.LENGTH_SHORT).show();
+
+            //newPost.put(GlobalUser.getToken());
 
             getDataVolley("localhost:5000/event/create", () -> {
 

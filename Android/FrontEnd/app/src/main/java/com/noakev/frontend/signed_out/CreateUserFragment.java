@@ -15,22 +15,45 @@ import com.noakev.frontend.R;
 import com.noakev.frontend.databinding.FragmentCreateUserBinding;
 import com.noakev.frontend.databinding.FragmentSignInBinding;
 
-public class CreateUserFragment extends Fragment {
+import org.json.JSONException;
+import org.json.JSONObject;
 
+public class CreateUserFragment extends Fragment {
+    private TextView username;
+    private TextView password;
+    private JSONObject newUser;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         FragmentCreateUserBinding binding = FragmentCreateUserBinding.inflate(getLayoutInflater(), container, false);
 
-        TextView username = (TextView) binding.usernametext;
-        TextView password = (TextView) binding.passwordtext;
+        username = (TextView) binding.usernametext;
+        password = (TextView) binding.passwordtext;
 
         Button register = binding.registerbtn;
         register.setOnClickListener(v -> {
+            Toast.makeText(getContext(), "Creating user...", Toast.LENGTH_SHORT).show();
+            createUser();
+            saveUser();
             SignedOutActivity mainActivity = (SignedOutActivity)(getActivity());
             mainActivity.navigateToSignIn();
         });
 
         return binding.getRoot();
+    }
+
+    private void createUser() {
+        newUser = new JSONObject();
+        try {
+            newUser.put("username", String.valueOf(username.getText()));
+            newUser.put("password", String.valueOf(password.getText()));
+            newUser.put("description", "something");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void saveUser() {
+        //.POST user
     }
 }
