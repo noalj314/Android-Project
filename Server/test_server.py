@@ -16,7 +16,7 @@ url = 'http://127.0.0.1:5000'
 
 # IMPORTANT: Save your database before, this destroys the database.
 app.config.update({
-    "SQLALCHEMY_DATABASE_URI": 'sqlite:///.//our.db'  # file-based SQLite database in the current directory
+    "SQLALCHEMY_DATABASE_URI": 'sqlite:///.//ourtest.db'  # file-based SQLite database in the current directory
 })
 @pytest.fixture(scope="session", autouse=True)
 def test_init():
@@ -30,7 +30,7 @@ def client():
     # Setup for testing
     app.config.update({
         "TESTING": True,
-        "SQLALCHEMY_DATABASE_URI": 'sqlite:///.//our.db' # file-based SQLite database in the current directory
+        "SQLALCHEMY_DATABASE_URI": 'sqlite:///.//ourtest.db' # file-based SQLite database in the current directory
     })
     with app.test_client() as client:
         with app.app_context():
