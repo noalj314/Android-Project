@@ -31,6 +31,7 @@ import org.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -40,7 +41,6 @@ public class CreateUserFragment extends Fragment {
     }
     private TextView username;
     private TextView password;
-    private JSONObject newUser;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -51,10 +51,14 @@ public class CreateUserFragment extends Fragment {
 
         Button register = binding.registerbtn;
         register.setOnClickListener(v -> {
-            Toast.makeText(getContext(), "Creating user...", Toast.LENGTH_SHORT).show();
-            saveUser();
-            SignedOutActivity mainActivity = (SignedOutActivity)(getActivity());
-            mainActivity.navigateToSignIn();
+            if (allFieldsAreFilled()) {
+                Toast.makeText(getContext(), "Creating user...", Toast.LENGTH_SHORT).show();
+                saveUser();
+                SignedOutActivity mainActivity = (SignedOutActivity)(getActivity());
+                mainActivity.navigateToSignIn();
+            } else {
+                Toast.makeText(getContext(), "Fill out all fields.", Toast.LENGTH_SHORT).show();
+            }
         });
 
         return binding.getRoot();
@@ -71,17 +75,8 @@ public class CreateUserFragment extends Fragment {
         // Request a string response from the provided URL.
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                 response -> {
-                    System.out.println("gets into success");
-                    // Create APIObject based on response data
-                    Gson gson = new Gson();
-                    System.out.println(response);
-                    //APIObject apiObject = gson.fromJson(response, APIObject.class);
-
-                    // Call listeners function
-                    //listener.onSuccess(apiObject);
                 },
                 volleyError -> {
-
                     if (volleyError.getClass() == com.android.volley.ClientError.class) {
                         // Get byte array from response data
                         byte[] byteArray = volleyError.networkResponse.data;
@@ -90,15 +85,9 @@ public class CreateUserFragment extends Fragment {
                         Gson gson = new Gson();
                         String jsonStringFromByteArray = new String(byteArray, StandardCharsets.UTF_8);
                         APIObject errorResponse = gson.fromJson(jsonStringFromByteArray, APIObject.class);
-
-                        // Call listeners function
-                        //listener.onError(errorResponse);
                     } else {
                         Log.e("NETWORK", "Network error.");
                         volleyError.printStackTrace();
-
-                        //APIObject errorResponse = new APIObject("fail", "Network error. Please try again.");
-                        //listener.onError(errorResponse);
 
                     }
                 }) {
@@ -112,7 +101,6 @@ public class CreateUserFragment extends Fragment {
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
-                System.out.println(jsonObject.toString());
 
                 return jsonObject.toString().getBytes();
             }
@@ -122,14 +110,13 @@ public class CreateUserFragment extends Fragment {
                 return "application/json";
             }
         };
-
-        int timeout = 10000; // 10 seconds
-        RetryPolicy policy = new DefaultRetryPolicy(timeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-        stringRequest.setRetryPolicy(policy);
-
-
         queue.add(stringRequest);
+    }
 
+    private boolean allFieldsAreFilled() {
+        if (username.getText().toString().isEmpty()) {
+            return false;
+        } else return !username.getText().toString().isEmpty();
     }
 }
 

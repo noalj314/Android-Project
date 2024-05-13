@@ -46,17 +46,11 @@ public class SignInFragment extends Fragment {
 
         Button loginbtn = binding.loginbtn;
         loginbtn.setOnClickListener(v -> {
-            fieldsAreCorrect();
-            /*
-            if (username.getText().toString().equals("admin") && password.getText().toString().equals("admin")) {
-                GlobalUser globalUser = new GlobalUser("abc", username.getText().toString());
-                SignedOutActivity mainActivity = (SignedOutActivity)(getActivity());
-                mainActivity.navigateHome();
-                Toast.makeText(getContext(), "LOGIN SUCCESSFUL", Toast.LENGTH_SHORT).show();
+            if (allFieldsAreFilled()) {
+                fieldsAreCorrect();
             } else {
-                Toast.makeText(getContext(), "LOGIN FAILED!!!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Fill out all fields.", Toast.LENGTH_SHORT).show();
             }
-             */
         });
 
         Button register = binding.register;
@@ -88,7 +82,6 @@ public class SignInFragment extends Fragment {
         // Request a string response from the provided URL.
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                 response -> {
-                    // Display the response string.
                     Gson gson = new Gson();
                     apiObject = gson.fromJson(response, APIObject.class);
                     callback.onDataFetched();
@@ -104,8 +97,6 @@ public class SignInFragment extends Fragment {
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
-                System.out.println(jsonObject.toString());
-
                 return jsonObject.toString().getBytes();
             }
 
@@ -115,5 +106,12 @@ public class SignInFragment extends Fragment {
             }
         };
         queue.add(stringRequest);
+    }
+
+
+    private boolean allFieldsAreFilled() {
+        if (username.getText().toString().isEmpty()) {
+            return false;
+        } else return !username.getText().toString().isEmpty();
     }
 }

@@ -36,14 +36,20 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.noakev.frontend.GlobalUser;
+import com.noakev.frontend.backend.APIObject;
 import com.noakev.frontend.databinding.FragmentPostBinding;
+import com.noakev.frontend.signed_in.HomeActivity;
 import com.noakev.frontend.signed_in.profile.Groups;
 import com.noakev.frontend.signed_in.profile.ProfileFragment;
+import com.noakev.frontend.signed_out.SignInFragment;
+import com.noakev.frontend.signed_out.SignedOutActivity;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
 
@@ -58,6 +64,7 @@ public class PostFragment extends Fragment {
     private LocationListener locationListener;
     private String currentAddress;
     private Bitmap photo;
+    private TextView username;
     public interface DataFetchedCallbackPost {
         void onDataFetched();
     }
@@ -71,15 +78,14 @@ public class PostFragment extends Fragment {
                              Bundle savedInstanceState) {
         binding = FragmentPostBinding.inflate(getLayoutInflater(), container, false);
 
-        TextView username = binding.publisher;
+        username = binding.publisher;
         Button selfieBtn = binding.selfiebutton;
         Button locationBtn = binding.locationbtn;
         Button postBtn = binding.postbtn;
+        binding.location.setText("Linköping");
 
         username.setText(GlobalUser.getUsername());
 
-        // Logik för att hämta användare
-        // binding.publisher.setText(getCurrentUser);
         selfieBtn.setOnClickListener(v -> {
             Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             startActivityForResult(cameraIntent, REQUEST_CODE);
@@ -93,13 +99,11 @@ public class PostFragment extends Fragment {
 
     private void createNewPost() {
         if (allColumnsAreFilled()) {
-            //Post post = new Post(String.valueOf(binding.description.getText()), currentAddress, getImageAsString());
             Toast.makeText(getContext(), "Creating post...", Toast.LENGTH_SHORT).show();
-
-            //newPost.put(GlobalUser.getToken());
-
-            getDataVolley("localhost:5000/event/create", () -> {
-
+            getDataVolley("http://10.0.2.2:5000/event/create", () -> {
+                Toast.makeText(getContext(), "Successfully created post.", Toast.LENGTH_SHORT).show();
+                HomeActivity homeActivity = (HomeActivity)(getActivity());
+                homeActivity.navigateHome();
             });
             // Save to database
         } else {
@@ -109,30 +113,60 @@ public class PostFragment extends Fragment {
 
     private boolean allColumnsAreFilled() {
         if (String.valueOf(binding.description.getText()).isEmpty()) {
-            Log.v("a", "a");
             return false;
         } else if (String.valueOf(binding.location.getText()).isEmpty()) {
-            Log.v("b", "b");
             return false;
         } else if (getImageAsString().isEmpty()) {
-            Log.v("c", "c");
             return false;
         }
         return true;
     }
 
-    public void getDataVolley(String url, DataFetchedCallbackPost callback) {
+    public void getDataVolley(String url, SignInFragment.DataFetchedCallbackSign callback) {
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(getContext());
 
         // Request a string response from the provided URL.
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                 response -> {
-                    // Display the response string.
                     callback.onDataFetched();
                 },
-                error -> Log.e("Network", error.getMessage())
-        );
+                error -> {
+                    if (error.getClass() == com.android.volley.ClientError.class) {
+                        // Get byte array from response data
+                        byte[] byteArray = error.networkResponse.data;
+
+                        // Convert byte array to APIObject using Gson
+                        Gson gson = new Gson();
+                        String jsonStringFromByteArray = new String(byteArray, StandardCharsets.UTF_8);
+                        APIObject errorResponse = gson.fromJson(jsonStringFromByteArray, APIObject.class);
+                    } else {
+                        Log.e("NETWORK", "Network error.");
+                        error.printStackTrace();
+
+                    }
+                }) {
+            @Override
+            public byte[] getBody() {
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("title", "A test title");
+                    jsonObject.put("description", binding.description.getText().toString());
+                    jsonObject.put("date", "A test date");
+                    jsonObject.put("location", binding.location.getText().toString());
+                    jsonObject.put("photo", getImageAsString());
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+                Log.v("fail", jsonObject.toString());
+                return jsonObject.toString().getBytes();
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+            }
+        };
         queue.add(stringRequest);
     }
 

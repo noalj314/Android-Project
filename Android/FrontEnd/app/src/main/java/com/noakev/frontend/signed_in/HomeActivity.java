@@ -6,6 +6,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
 
@@ -13,6 +14,8 @@ import android.os.Bundle;
 
 import com.google.android.material.navigation.NavigationView;
 import com.noakev.frontend.R;
+import com.noakev.frontend.signed_in.post.PostFragmentDirections;
+import com.noakev.frontend.signed_out.CreateUserFragmentDirections;
 
 public class HomeActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
@@ -45,5 +48,10 @@ public class HomeActivity extends AppCompatActivity {
         } else {
             super.onBackPressed();
         }
+    }
+
+    public void navigateHome() {
+        NavDirections action = PostFragmentDirections.actionPostFragmentToHomeFragment();
+        Navigation.findNavController(this, R.id.fragment_container).navigate(action);
     }
 }
