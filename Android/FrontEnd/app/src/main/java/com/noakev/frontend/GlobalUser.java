@@ -16,4 +16,5 @@ public class GlobalUser {
     public static String getUsername() {
         return username;
     }
+
 }
