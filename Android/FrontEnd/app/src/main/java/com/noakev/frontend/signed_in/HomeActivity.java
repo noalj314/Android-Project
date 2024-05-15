@@ -11,10 +11,14 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
 
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.SearchView;
 
 import com.google.android.material.navigation.NavigationView;
 import com.noakev.frontend.R;
 import com.noakev.frontend.signed_in.post.PostFragmentDirections;
+import com.noakev.frontend.signed_in.search.SearchFragmentDirections;
 import com.noakev.frontend.signed_out.CreateUserFragmentDirections;
 
 public class HomeActivity extends AppCompatActivity {
@@ -52,6 +56,11 @@ public class HomeActivity extends AppCompatActivity {
 
     public void navigateHome() {
         NavDirections action = PostFragmentDirections.actionPostFragmentToHomeFragment();
+        Navigation.findNavController(this, R.id.fragment_container).navigate(action);
+    }
+
+    public void navigateToProfile(String username) {
+        NavDirections action = SearchFragmentDirections.actionSearchFragmentToProfileFragment(username);
         Navigation.findNavController(this, R.id.fragment_container).navigate(action);
     }
 }

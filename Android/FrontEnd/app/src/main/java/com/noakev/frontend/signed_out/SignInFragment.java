@@ -64,7 +64,7 @@ public class SignInFragment extends Fragment {
 
     private void fieldsAreCorrect() {
         getDataVolley("http://10.0.2.2:5000/user/login", () -> {
-            if (apiObject.getToken() == null) {
+            if (apiObject.getToken().isEmpty()) {
                 Toast.makeText(getContext(), "no such user!!!", Toast.LENGTH_SHORT).show();
             } else {
                 GlobalUser globalUser = new GlobalUser(apiObject.getToken(), username.getText().toString());

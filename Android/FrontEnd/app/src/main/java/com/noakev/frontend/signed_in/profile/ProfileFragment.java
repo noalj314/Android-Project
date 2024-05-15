@@ -45,7 +45,7 @@ public class ProfileFragment extends Fragment implements ClickListener {
     private Groups followingGroups;
     private Adapter followersAdapter;
     private Adapter followingAdapter;
-    private ImageView selfieHolder;
+    private TextView usernameTv;
     public interface DataFetchedCallback {
         void onDataFetched(Groups groups);
     }
@@ -59,6 +59,15 @@ public class ProfileFragment extends Fragment implements ClickListener {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentProfileBinding.inflate(getLayoutInflater(), container, false);
+
+        usernameTv = binding.username;
+
+        if (getArguments() != null) {
+            String user = getArguments().getString("username");
+            usernameTv.setText(user);
+        } else {
+            usernameTv.setText(currentUser);
+        }
 
         RecyclerView followerRv = binding.groups;
         followerRv.setHasFixedSize(true);
@@ -77,11 +86,9 @@ public class ProfileFragment extends Fragment implements ClickListener {
 
         // Lok för att hämta nuvarande användare
         // Get current user
-        TextView usernameTv = binding.username;
-        usernameTv.setText(currentUser);
 
 
-        getDataVolley("https://brave-mud-8154b800471f41b1bbae6eea8237e22e.azurewebsites.net/grupper", (groups) -> {
+        getDataVolley("http://10.0.2.2:5000/user/get_followers/", (groups) -> {
             followerGroups = groups;
             followersAdapter.setData(followerGroups.getUsers());
             followersTv = binding.numberoffollowers;
@@ -97,13 +104,6 @@ public class ProfileFragment extends Fragment implements ClickListener {
 
         VolleyData volleyData = new VolleyData();
         JSONObject obj = new JSONObject();
-
-        selfieHolder = binding.selfieholder;
-        Button selfieBtn = binding.selfiebutton;
-        selfieBtn.setOnClickListener(v -> {
-            Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            startActivityForResult(cameraIntent, REQUEST_CODE);
-        });
 
         return binding.getRoot();
     }
@@ -128,17 +128,5 @@ public class ProfileFragment extends Fragment implements ClickListener {
         // Logik för att kolla om currentProfile följer profileName
         // Om ja -> byt profil
         // Om nej "You're not following $"User"
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
-            Bitmap photo = (Bitmap) data.getExtras().get("data");
-            selfieHolder.setImageBitmap(photo);
-            // Logik för att spara bilden på backend
-        } else {
-            Toast.makeText(getContext(), "Cancelled", Toast.LENGTH_SHORT).show();
-            super.onActivityResult(requestCode, resultCode, data);
-        }
     }
 }
