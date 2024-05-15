@@ -5,9 +5,7 @@ from flask_jwt_extended import create_access_token
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
 from flask_jwt_extended import JWTManager
-from flask_bcrypt import Bcrypt
 from database import *
-import requests
 
 app.config['JWT_SECRET_KEY'] = "London calling to the faraway towns..."
 bcrypt = Bcrypt(app)
@@ -105,7 +103,7 @@ def unfollow_user(username):
 @app.route('/user/find_user/<username>', methods=['GET'])
 def find_user_by_username(username):
     """Find a user by username, used for searching. Requires a jwt token."""
-    user_to_find = User.query.filter_by(username=username)
+    user_to_find = User.query.filter_by(username=username).first()
     if user_to_find is None:
         return jsonify({'message': 'No such user'}), 404
     return jsonify(user_to_find.to_dict()), 200
@@ -139,7 +137,6 @@ def create_event():
         event = Event(description=event_data['description'], location=event_data['location'], photo=event_data['photo'], user_id=user_id, username=username)
         db.session.add(event)
         User.query.filter_by(id=user_id).first().created_events.append(event)
-
         db.session.commit()
         return jsonify({'message': 'Event created'}), 200
     except KeyError:
@@ -177,7 +174,7 @@ def follow_event(event_id):
     if current_user is None:
         return jsonify({'message': 'Faulty login'}), 404
     if event_to_follow in current_user.followed_events:
-        return jsonify({'message': 'Already following'}), 400
+        return jsonify({'message': 'Already folloxwing'}), 400
     current_user.followed_events.append(event_to_follow)
     db.session.commit()
     return jsonify({'message': f"{event_id} followed"}), 200

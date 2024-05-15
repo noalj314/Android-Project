@@ -32,10 +32,6 @@ event_followed = db.Table('event_followed',
                           db.Column('event_id', db.String, db.ForeignKey('event.id'), primary_key=True)
                           )
 
-event_going = db.Table('event_going',
-                       db.Column('user_id', db.String, db.ForeignKey('user.id'), primary_key=True),
-                       db.Column('event_id', db.String, db.ForeignKey('event.id'), primary_key=True))
-
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -67,7 +63,6 @@ class User(db.Model):
         return {
             'id': self.id,
             'username': self.username,
-            'email': self.email,
             'description': self.description,
             'photo': self.photo
         }
