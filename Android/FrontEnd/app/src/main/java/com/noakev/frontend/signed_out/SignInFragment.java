@@ -18,12 +18,8 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.noakev.frontend.GlobalUser;
-import com.noakev.frontend.R;
 import com.noakev.frontend.backend.APIObject;
 import com.noakev.frontend.databinding.FragmentSignInBinding;
-import com.noakev.frontend.signed_in.post.PostFragment;
-import com.noakev.frontend.signed_in.profile.Groups;
-import com.noakev.frontend.signed_in.profile.ProfileFragment;
 
 import org.json.JSONException;
 import org.json.JSONObject;

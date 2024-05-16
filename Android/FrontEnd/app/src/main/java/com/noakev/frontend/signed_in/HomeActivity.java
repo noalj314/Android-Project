@@ -11,16 +11,12 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
 
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.SearchView;
 
 import com.google.android.material.navigation.NavigationView;
 import com.noakev.frontend.R;
-import com.noakev.frontend.signed_in.post.PostFragmentDirections;
+import com.noakev.frontend.signed_in.event.EventFragmentDirections;
 import com.noakev.frontend.signed_in.profile.ProfileFragmentDirections;
 import com.noakev.frontend.signed_in.search.SearchFragmentDirections;
-import com.noakev.frontend.signed_out.CreateUserFragmentDirections;
 
 public class HomeActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
@@ -56,7 +52,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public void navigateHome() {
-        NavDirections action = PostFragmentDirections.actionPostFragmentToHomeFragment();
+        NavDirections action = EventFragmentDirections.actionEventFragmentToHomeFragment();
         Navigation.findNavController(this, R.id.fragment_container).navigate(action);
     }
 

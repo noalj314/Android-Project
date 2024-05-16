@@ -1,4 +1,4 @@
-package com.noakev.frontend.signed_in.post;
+package com.noakev.frontend.signed_in.event;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,18 +16,18 @@ import com.noakev.frontend.R;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
+public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
     private ArrayList<HashMap> localData;
     private ClickListener listener;
 
     //public Context mContext;
-    //ublic List<Post> mPost;
+    //ublic List<Event> mPost;
     private String username;
 
-    public PostAdapter() {
+    public Adapter() {
         this.localData = new ArrayList<>();
-/*        Context mContext, List<Post> mPost
+/*        Context mContext, List<Event> mPost
         this.mContext = mContext;
         this.mPost = mPost;*/
     }

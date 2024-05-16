@@ -18,8 +18,8 @@
             app:exitAnim="@android:anim/slide_out_right" >
         </action>
         <action
-            android:id="@+id/action_homeFragment_to_postFragment"
-            app:destination="@id/postFragment" />
+            android:id="@+id/action_homeFragment_to_eventFragment"
+            app:destination="@id/eventFragment" />
         <action
             android:id="@+id/action_homeFragment_to_otherProfilesFragment"
             app:destination="@id/otherProfilesFragment" />
@@ -39,8 +39,8 @@
             android:id="@+id/action_profileFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
         <action
-            android:id="@+id/action_profileFragment_to_postFragment"
-            app:destination="@id/postFragment" />
+            android:id="@+id/action_profileFragment_to_eventFragment"
+            app:destination="@id/eventFragment" />
         <action
             android:id="@+id/action_profileFragment_to_otherProfilesFragment"
             app:destination="@id/otherProfilesFragment" />
@@ -56,19 +56,19 @@
         </action>
     </fragment>
     <fragment
-        android:id="@+id/postFragment"
-        android:name="com.noakev.frontend.signed_in.post.PostFragment"
-        android:label="fragment_post"
-        tools:layout="@layout/fragment_post" >
+        android:id="@+id/eventFragment"
+        android:name="com.noakev.frontend.signed_in.event.EventFragment"
+        android:label="fragment_event"
+        tools:layout="@layout/fragment_event" >
         <action
-            android:id="@+id/action_postFragment_to_profileFragment"
+            android:id="@+id/action_eventFragment_to_profileFragment"
             app:destination="@id/profileFragment" >
         </action>
         <action
-            android:id="@+id/action_postFragment_to_homeFragment"
+            android:id="@+id/action_eventFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
         <action
-            android:id="@+id/action_postFragment_to_searchFragment"
+            android:id="@+id/action_eventFragment_to_searchFragment"
             app:destination="@id/searchFragment" />
     </fragment>
     <fragment

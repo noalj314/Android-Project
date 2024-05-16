@@ -1,4 +1,4 @@
-package com.noakev.frontend.signed_in.post;
+package com.noakev.frontend.signed_in.event;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -37,12 +37,9 @@ import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.noakev.frontend.GlobalUser;
 import com.noakev.frontend.backend.APIObject;
-import com.noakev.frontend.databinding.FragmentPostBinding;
+import com.noakev.frontend.databinding.FragmentEventBinding;
 import com.noakev.frontend.signed_in.HomeActivity;
-import com.noakev.frontend.signed_in.profile.Groups;
-import com.noakev.frontend.signed_in.profile.ProfileFragment;
 import com.noakev.frontend.signed_out.SignInFragment;
-import com.noakev.frontend.signed_out.SignedOutActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -55,17 +52,17 @@ import java.util.Locale;
 
 /**
  */
-public class PostFragment extends Fragment {
-    private String currentUser = GlobalUser.getUsername();
+public class EventFragment extends Fragment {
+    private final String currentUser = GlobalUser.getUsername();
     private static final int REQUEST_CODE = 22;
     private JSONObject newPost;
-    private FragmentPostBinding binding;
+    private FragmentEventBinding binding;
     private Button postBtn;
     private LocationManager locationManager;
     private LocationListener locationListener;
     private String currentAddress;
     private Bitmap photo;
-    private TextView username;
+
     public interface DataFetchedCallbackPost {
         void onDataFetched();
     }
@@ -77,9 +74,9 @@ public class PostFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        binding = FragmentPostBinding.inflate(getLayoutInflater(), container, false);
+        binding = FragmentEventBinding.inflate(getLayoutInflater(), container, false);
 
-        username = binding.publisher;
+        TextView username = binding.publisher;
         Button selfieBtn = binding.selfiebutton;
         Button locationBtn = binding.locationbtn;
         Button postBtn = binding.postbtn;
@@ -101,7 +98,7 @@ public class PostFragment extends Fragment {
     private void createNewPost() {
         if (allColumnsAreFilled()) {
             Toast.makeText(getContext(), "Creating post...", Toast.LENGTH_SHORT).show();
-            getDataVolley("http://10.0.2.2:5000/event/create/" + currentUser, () -> {
+            getDataVolley("http://10.0.2.2:5000/event/create", () -> {
                 Toast.makeText(getContext(), "Successfully created post.", Toast.LENGTH_SHORT).show();
                 HomeActivity homeActivity = (HomeActivity)(getActivity());
                 homeActivity.navigateHome();
@@ -151,10 +148,9 @@ public class PostFragment extends Fragment {
             public byte[] getBody() {
                 JSONObject jsonObject = new JSONObject();
                 try {
-                    jsonObject.put("title", "A test title");
-                    jsonObject.put("description", binding.description.getText().toString());
+                    jsonObject.put("username", currentUser);
                     jsonObject.put("location", binding.location.getText().toString());
-                    jsonObject.put("date", "A test date");
+                    jsonObject.put("description", binding.description.getText().toString());
                     jsonObject.put("photo", getImageAsString());
                 } catch (JSONException e) {
                     throw new RuntimeException(e);

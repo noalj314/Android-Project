@@ -1,12 +1,9 @@
-package com.noakev.frontend.signed_in.post;
-
-import com.noakev.frontend.signed_in.profile.User;
+package com.noakev.frontend.signed_in.event;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Posts {
-    private ArrayList<Post> events = new ArrayList<>();
+    private ArrayList<Event> events = new ArrayList<>();
     public ArrayList getUsers(){
         return events;
     }
@@ -15,11 +12,11 @@ public class Posts {
         return new StringBuilder();
     }
 
-    public void setMembers(ArrayList<Post> medlemmar) {
+    public void setMembers(ArrayList<Event> medlemmar) {
         this.events = medlemmar;
     }
 
-    public ArrayList<Post> getEvents() {
+    public ArrayList<Event> getEvents() {
         return events;
     }
 

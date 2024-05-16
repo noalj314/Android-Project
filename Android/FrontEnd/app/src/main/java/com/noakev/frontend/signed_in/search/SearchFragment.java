@@ -51,11 +51,11 @@ public class SearchFragment extends Fragment {
         searchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                user.setText("mohammed");
-                /*getDataVolley("http://10.0.2.2:5000/user/find_user/" + searchTxt.getText().toString(), () -> {
+                //user.setText("mohammed");
+                getDataVolley("http://10.0.2.2:5000/user/find_user/" + searchTxt.getText().toString(), () -> {
                     user.setText(apiObject.getUsername());
                     username = apiObject.getUsername();
-                });*/
+                });
             }
         });
 

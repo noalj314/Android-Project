@@ -13,17 +13,13 @@ import android.view.ViewGroup;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
-import com.noakev.frontend.signed_in.post.Post;
-import com.noakev.frontend.signed_in.post.PostAdapter;
-import com.noakev.frontend.signed_in.post.Posts;
+import com.noakev.frontend.signed_in.event.Event;
+import com.noakev.frontend.signed_in.event.Adapter;
+import com.noakev.frontend.signed_in.event.Posts;
 import com.noakev.frontend.databinding.FragmentHomeBinding;
-import com.noakev.frontend.signed_in.profile.Groups;
-import com.noakev.frontend.signed_in.profile.ProfileFragment;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,7 +29,7 @@ public class HomeFragment extends Fragment {
     private FragmentHomeBinding binding;
     private RecyclerView recyclerView;
     private Posts events;
-    private PostAdapter adapter;
+    private Adapter adapter;
     public interface DataFetchedCallbackHome {
         void onDataFetched(Posts events);
     }
@@ -45,20 +41,20 @@ public class HomeFragment extends Fragment {
 
         RecyclerView rv = binding.posts;
         ArrayList<HashMap> data = new ArrayList<>();
-        PostAdapter postAdapter = new PostAdapter();
+        Adapter adapter = new Adapter();
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
-        rv.setAdapter(postAdapter);
+        rv.setAdapter(adapter);
 
         getDataVolley("http://localhost:5000/event/get_events/", (events) -> {
             int i = 0;
-            for (Post post : events.getEvents()) {
+            for (Event event : events.getEvents()) {
                 HashMap<String, String> deats = new HashMap<>();
                 deats.put("id", "dW"+i);
                 data.add(deats);
                 i++;
             }
         });
-        postAdapter.setLocalData(data);
+        adapter.setLocalData(data);
 
         return binding.getRoot();
     }
