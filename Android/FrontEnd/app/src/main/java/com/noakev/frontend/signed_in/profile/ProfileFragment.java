@@ -9,6 +9,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -30,6 +32,8 @@ import com.google.gson.Gson;
 import com.noakev.frontend.GlobalUser;
 import com.noakev.frontend.backend.VolleyData;
 import com.noakev.frontend.databinding.FragmentProfileBinding;
+import com.noakev.frontend.signed_in.HomeActivity;
+import com.noakev.frontend.signed_in.search.SearchFragmentDirections;
 
 import org.json.JSONObject;
 
@@ -88,7 +92,7 @@ public class ProfileFragment extends Fragment implements ClickListener {
         // Get current user
 
 
-        getDataVolley("http://10.0.2.2:5000/user/get_followers/", (groups) -> {
+        getDataVolley("https://brave-mud-8154b800471f41b1bbae6eea8237e22e.azurewebsites.net/grupper", (groups) -> {
             followerGroups = groups;
             followersAdapter.setData(followerGroups.getUsers());
             followersTv = binding.numberoffollowers;
@@ -125,8 +129,7 @@ public class ProfileFragment extends Fragment implements ClickListener {
     }
 
     public void textClicked(String profileName) {
-        // Logik för att kolla om currentProfile följer profileName
-        // Om ja -> byt profil
-        // Om nej "You're not following $"User"
+        HomeActivity homeActivity = (HomeActivity)(getActivity());
+        homeActivity.navigateToSelf(profileName);
     }
 }

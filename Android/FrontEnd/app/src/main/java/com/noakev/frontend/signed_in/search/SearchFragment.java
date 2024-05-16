@@ -22,6 +22,7 @@ import com.google.gson.Gson;
 import com.noakev.frontend.R;
 import com.noakev.frontend.backend.APIObject;
 import com.noakev.frontend.databinding.FragmentSearchBinding;
+import com.noakev.frontend.signed_in.HomeActivity;
 import com.noakev.frontend.signed_in.profile.Groups;
 import com.noakev.frontend.signed_in.profile.ProfileFragment;
 
@@ -58,12 +59,9 @@ public class SearchFragment extends Fragment {
             }
         });
 
-        user.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                NavDirections action = SearchFragmentDirections.actionSearchFragmentToProfileFragment(username);
-                Navigation.findNavController(v).navigate(action);
-            }
+        user.setOnClickListener(v -> {
+            HomeActivity homeActivity = (HomeActivity)(getActivity());
+            homeActivity.navigateToProfile(user.getText().toString());
         });
 
         return binding.getRoot();

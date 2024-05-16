@@ -56,6 +56,7 @@ import java.util.Locale;
 /**
  */
 public class PostFragment extends Fragment {
+    private String currentUser = GlobalUser.getUsername();
     private static final int REQUEST_CODE = 22;
     private JSONObject newPost;
     private FragmentPostBinding binding;
@@ -100,7 +101,7 @@ public class PostFragment extends Fragment {
     private void createNewPost() {
         if (allColumnsAreFilled()) {
             Toast.makeText(getContext(), "Creating post...", Toast.LENGTH_SHORT).show();
-            getDataVolley("http://10.0.2.2:5000/event/create", () -> {
+            getDataVolley("http://10.0.2.2:5000/event/create/" + currentUser, () -> {
                 Toast.makeText(getContext(), "Successfully created post.", Toast.LENGTH_SHORT).show();
                 HomeActivity homeActivity = (HomeActivity)(getActivity());
                 homeActivity.navigateHome();
@@ -152,13 +153,13 @@ public class PostFragment extends Fragment {
                 try {
                     jsonObject.put("title", "A test title");
                     jsonObject.put("description", binding.description.getText().toString());
-                    jsonObject.put("date", "A test date");
                     jsonObject.put("location", binding.location.getText().toString());
+                    jsonObject.put("date", "A test date");
                     jsonObject.put("photo", getImageAsString());
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
-                Log.v("fail", jsonObject.toString());
+                Log.v("JSON", jsonObject.toString());
                 return jsonObject.toString().getBytes();
             }
 
