@@ -109,19 +109,19 @@ def find_user_by_username(username):
     return jsonify(user_to_find.to_dict()), 200
 
 
-@app.route('/user/get_followers/<user_id>', methods=['GET'])
-def get_followers(user_id):
+@app.route('/user/get_followers/username', methods=['GET'])
+def get_followers(username):
     """Get all followers of a user."""
-    user_to_check = User.query.filter_by(id=user_id).first()
+    user_to_check = User.query.filter_by(id=username).first()
     if user_to_check is None:
         return jsonify({'message': 'Faulty login'}), 404
     return jsonify([u.username_to_dict() for u in user_to_check.followers]), 200
 
 
-@app.route('/user/get_following/<user_id>', methods=['GET'])
-def get_following(user_id):
+@app.route('/user/get_following/<username>', methods=['GET'])
+def get_following(username):
     """Get all users that a user follows."""
-    user_to_check = User.query.filter_by(id=user_id).first()
+    user_to_check = User.query.filter_by(id=username).first()
     if user_to_check is None:
         return jsonify({'message': 'Faulty login'}), 404
     return [u for u in user_to_check.follows], 200
