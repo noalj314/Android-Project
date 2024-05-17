@@ -9,6 +9,7 @@ public class APIObject {
     private String password;
     private String description;
     private String token;
+    private String message;
     private ArrayList<Event> events;
     private ArrayList<String> followers;
     private ArrayList<String> following;
@@ -29,6 +30,9 @@ public class APIObject {
 
     public String getToken() {
         return token;
+    }
+    public String getMessage() {
+        return message;
     }
     public ArrayList<String> getUsers(){
         return grupper;

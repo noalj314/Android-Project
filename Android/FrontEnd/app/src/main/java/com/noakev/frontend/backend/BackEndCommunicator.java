@@ -7,6 +7,10 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
+import com.noakev.frontend.GlobalUser;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class BackEndCommunicator {
     private String url = "http://10.0.2.2:5000";
@@ -28,6 +32,13 @@ public class BackEndCommunicator {
                     listener.onError(apiObject);
                 }
         ) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> header = new HashMap<>();
+                header.put("Authorization","Bearer "+GlobalUser.getToken());
+                return header;
+            }
+
             @Override
             public byte[] getBody() {
                 return jsonObject;

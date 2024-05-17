@@ -21,6 +21,8 @@ import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.noakev.frontend.R;
 import com.noakev.frontend.backend.APIObject;
+import com.noakev.frontend.backend.BackEndCommunicator;
+import com.noakev.frontend.backend.ResponseListener;
 import com.noakev.frontend.databinding.FragmentSearchBinding;
 import com.noakev.frontend.signed_in.HomeActivity;
 import com.noakev.frontend.signed_in.profile.Groups;
@@ -30,9 +32,6 @@ import com.noakev.frontend.signed_in.profile.ProfileFragment;
  * A simple {@link Fragment} subclass.
  */
 public class SearchFragment extends Fragment {
-    public interface DataFetchedCallbackSearch {
-        void onDataFetched();
-    }
     private FragmentSearchBinding binding;
     private EditText searchTxt;
     private String username;
@@ -48,15 +47,20 @@ public class SearchFragment extends Fragment {
         TextView user = binding.relevantuser;
 
         Button searchBtn = binding.searchbtn;
-        searchBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //user.setText("mohammed");
-                getDataVolley("http://10.0.2.2:5000/user/find_user/" + searchTxt.getText().toString(), () -> {
+        searchBtn.setOnClickListener(v -> {
+            final String userToFind = searchTxt.getText().toString();
+            BackEndCommunicator communicator = new BackEndCommunicator();
+            communicator.sendRequest(0, "/user/find_user/"+userToFind, null, getContext(), new ResponseListener() {
+                @Override
+                public void onSucces(APIObject apiObject) {
                     user.setText(apiObject.getUsername());
-                    username = apiObject.getUsername();
-                });
-            }
+                }
+
+                @Override
+                public void onError(APIObject apiObject) {
+                    Log.v("Error", apiObject.getMessage());
+                }
+            });
         });
 
         user.setOnClickListener(v -> {
@@ -65,22 +69,5 @@ public class SearchFragment extends Fragment {
         });
 
         return binding.getRoot();
-    }
-
-    public void getDataVolley(String url, DataFetchedCallbackSearch callback) {
-        // Instantiate the RequestQueue.
-        RequestQueue queue = Volley.newRequestQueue(getContext());
-
-        // Request a string response from the provided URL.
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                response -> {
-                    // Display the response string.
-                    Gson gson = new Gson();
-                    apiObject = gson.fromJson(response, APIObject.class);
-                    callback.onDataFetched();
-                },
-                error -> Log.e("Network", error.getMessage())
-        );
-        queue.add(stringRequest);
     }
 }
