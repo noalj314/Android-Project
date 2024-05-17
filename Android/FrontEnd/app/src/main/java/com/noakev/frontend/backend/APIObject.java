@@ -1,6 +1,7 @@
 package com.noakev.frontend.backend;
 
 import com.noakev.frontend.signed_in.event.Event;
+import com.noakev.frontend.signed_in.profile.User;
 
 import java.util.ArrayList;
 
@@ -34,7 +35,24 @@ public class APIObject {
     public String getMessage() {
         return message;
     }
-    public ArrayList<String> getUsers(){
+
+    public ArrayList<Event> getEvents() {
+        return events;
+    }
+
+    public ArrayList<String> getFollowersList() {
+        return followers;
+    }
+
+    public ArrayList<String> getFollowingList() {
+        return following;
+    }
+
+    public ArrayList<String> getUsers_liked() {
+        return users_liked;
+    }
+
+    public ArrayList<String> getGrupper() {
         return grupper;
     }
 }

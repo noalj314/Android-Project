@@ -46,7 +46,6 @@ public class Adapter extends RecyclerView.Adapter<Adapter.RecyclerViewHolder> {
     public void setData(ArrayList<String> data) {
         this.data = data;
         this.notifyDataSetChanged();
-
     }
     @Override
     public int getItemCount() {

@@ -66,7 +66,6 @@ public class SignInFragment extends Fragment {
         communicator.sendRequest(1, route, getBody(), getContext(), new ResponseListener() {
             public void onSucces(APIObject apiObject) {
                 GlobalUser.setToken(apiObject.getToken());
-                Log.v("token", "token: " +apiObject.getToken());
                 GlobalUser.setUsername(username.getText().toString());
                 SignedOutActivity mainActivity = (SignedOutActivity)(getActivity());
                 mainActivity.navigateHome();

@@ -23,6 +23,7 @@ public class BackEndCommunicator {
         StringRequest stringRequest = new StringRequest(requestMethod, url+route,
                 response -> {
                     // Display the response string.
+                    Log.e("RESPONSE", response.toString());
                     APIObject apiObject = gson.fromJson(response, APIObject.class);
                     listener.onSucces(apiObject);
                 },

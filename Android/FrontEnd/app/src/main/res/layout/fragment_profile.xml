@@ -57,7 +57,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="100dp"
-                android:text="FOLLOW"
+                android:text="follow"
                 android:visibility="visible" />
         </LinearLayout>
 
