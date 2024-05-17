@@ -18,7 +18,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
-import com.noakev.frontend.backend.VolleyData;
+import com.noakev.frontend.backend.BackEndCommunicator;
 import com.noakev.frontend.databinding.FragmentOtherProfilesBinding;
 
 import org.json.JSONObject;
@@ -85,7 +85,7 @@ public class OtherProfilesFragment extends Fragment implements ClickListener {
             followingTv.setText("Following: " + followingAdapter.getItemCount());
         });
 
-        VolleyData volleyData = new VolleyData();
+        BackEndCommunicator backEndCommunicator = new BackEndCommunicator();
         JSONObject obj = new JSONObject();
 
         selfieHolder = binding.selfieholder;

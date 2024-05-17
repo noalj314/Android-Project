@@ -13,6 +13,7 @@ public class APIObject {
     private ArrayList<String> followers;
     private ArrayList<String> following;
     private ArrayList<String> users_liked;
+    ArrayList<String> grupper;
 
     public String getUsername() {
         return username;
@@ -28,5 +29,8 @@ public class APIObject {
 
     public String getToken() {
         return token;
+    }
+    public ArrayList<String> getUsers(){
+        return grupper;
     }
 }

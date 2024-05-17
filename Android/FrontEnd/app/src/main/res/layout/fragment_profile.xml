@@ -20,31 +20,45 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         >
-
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="50dp"
-            android:orientation="vertical"
+            android:orientation="horizontal"
+            android:id="@+id/info"
             >
-            <TextView
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="50dp"
+                    android:orientation="vertical"
+                    >
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/username"
+                        android:text="username"
+                        />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/numberoffollowers"
+                        android:text="Followers: 23"
+                        />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/numberoffollowing"
+                        android:text="Following: 17"
+                        />
+                </LinearLayout>
+
+            <Button
+                android:id="@+id/followbtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/username"
-                android:text="username"
-                />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/numberoffollowers"
-                android:text="Followers: 23"
-                />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/numberoffollowing"
-                android:text="Following: 17"
-                />
+                android:layout_marginLeft="100dp"
+                android:text="FOLLOW"
+                android:visibility="visible" />
         </LinearLayout>
 
 

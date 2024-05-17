@@ -1,28 +1,17 @@
 package com.noakev.frontend.signed_in.profile;
 
-import static android.app.Activity.RESULT_OK;
-
-import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.NavDirections;
-import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -30,12 +19,8 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.noakev.frontend.GlobalUser;
-import com.noakev.frontend.backend.VolleyData;
 import com.noakev.frontend.databinding.FragmentProfileBinding;
 import com.noakev.frontend.signed_in.HomeActivity;
-import com.noakev.frontend.signed_in.search.SearchFragmentDirections;
-
-import org.json.JSONObject;
 
 /**
  */
@@ -69,8 +54,15 @@ public class ProfileFragment extends Fragment implements ClickListener {
         if (getArguments() != null) {
             String user = getArguments().getString("username");
             usernameTv.setText(user);
+            if (userIsFollowerd()) {
+                Log.v("username",getArguments().toString());
+                binding.followbtn.setText("unfollow");
+            }
+            setArguments(null);
+            //Check following
         } else {
             usernameTv.setText(currentUser);
+            binding.followbtn.setVisibility(View.INVISIBLE);
         }
 
         RecyclerView followerRv = binding.groups;
@@ -87,11 +79,6 @@ public class ProfileFragment extends Fragment implements ClickListener {
         followingAdapter.setListener(ProfileFragment.this);
         followingRv.setAdapter(followingAdapter);
 
-
-        // Lok för att hämta nuvarande användare
-        // Get current user
-
-
         getDataVolley("https://brave-mud-8154b800471f41b1bbae6eea8237e22e.azurewebsites.net/grupper", (groups) -> {
             followerGroups = groups;
             followersAdapter.setData(followerGroups.getUsers());
@@ -106,11 +93,13 @@ public class ProfileFragment extends Fragment implements ClickListener {
             followingTv.setText("Following: " + followingAdapter.getItemCount());
         });
 
-        VolleyData volleyData = new VolleyData();
-        JSONObject obj = new JSONObject();
-
         return binding.getRoot();
     }
+
+    private boolean userIsFollowerd() {
+        return false;
+    }
+
     public void getDataVolley(String url, DataFetchedCallback callback) {
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(getContext());

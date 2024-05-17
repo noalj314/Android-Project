@@ -3,12 +3,6 @@ package com.noakev.frontend;
 public class GlobalUser {
     private static String token;
     private static String username;
-
-    public GlobalUser(String token, String username) {
-        this.token = token;
-        this.username = username;
-    }
-
     public static String getToken() {
         return token;
     }
@@ -17,4 +11,11 @@ public class GlobalUser {
         return username;
     }
 
+    public static void setToken(String token) {
+        GlobalUser.token = token;
+    }
+
+    public static void setUsername(String username) {
+        GlobalUser.username = username;
+    }
 }

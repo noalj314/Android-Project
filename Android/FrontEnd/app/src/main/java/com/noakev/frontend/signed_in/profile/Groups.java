@@ -12,4 +12,6 @@ public class Groups {
     public void setMembers(ArrayList<String> grupper) {
         this.grupper = grupper;
     }
+
+
 }

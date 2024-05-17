@@ -14,11 +14,14 @@ import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.noakev.frontend.GlobalUser;
 import com.noakev.frontend.backend.APIObject;
+import com.noakev.frontend.backend.BackEndCommunicator;
+import com.noakev.frontend.backend.ResponseListener;
 import com.noakev.frontend.databinding.FragmentSignInBinding;
 
 import org.json.JSONException;
@@ -43,7 +46,7 @@ public class SignInFragment extends Fragment {
         Button loginbtn = binding.loginbtn;
         loginbtn.setOnClickListener(v -> {
             if (allFieldsAreFilled()) {
-                fieldsAreCorrect();
+                getDataVolley("/user/login");
             } else {
                 Toast.makeText(getContext(), "Fill out all fields.", Toast.LENGTH_SHORT).show();
             }
@@ -58,52 +61,36 @@ public class SignInFragment extends Fragment {
         return binding.getRoot();
     }
 
-    private void fieldsAreCorrect() {
-        getDataVolley("http://10.0.2.2:5000/user/login", () -> {
-            if (apiObject.getToken().isEmpty()) {
-                Toast.makeText(getContext(), "no such user!!!", Toast.LENGTH_SHORT).show();
-            } else {
-                GlobalUser globalUser = new GlobalUser(apiObject.getToken(), username.getText().toString());
+    public void getDataVolley(String route) {
+        BackEndCommunicator communicator = new BackEndCommunicator();
+        communicator.sendRequest(1, route, getBody(), getContext(), new ResponseListener() {
+            public void onSucces(APIObject apiObject) {
+                GlobalUser.setToken(apiObject.getToken());
+                GlobalUser.setUsername(username.getText().toString());
                 SignedOutActivity mainActivity = (SignedOutActivity)(getActivity());
                 mainActivity.navigateHome();
                 Toast.makeText(getContext(), "LOGIN SUCCESSFUL", Toast.LENGTH_SHORT).show();
             }
+
+            public void onError(APIObject apiObject) {
+                if (apiObject.getToken().isEmpty()) {
+                    Toast.makeText(getContext(), "no such user!!!", Toast.LENGTH_SHORT).show();
+                }
+                Log.e("Network", "fail");
+            }
         });
     }
 
-    public void getDataVolley(String url, DataFetchedCallbackSign callback) {
-        // Instantiate the RequestQueue.
-        RequestQueue queue = Volley.newRequestQueue(getContext());
-
-        // Request a string response from the provided URL.
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                response -> {
-                    Gson gson = new Gson();
-                    apiObject = gson.fromJson(response, APIObject.class);
-                    callback.onDataFetched();
-                },
-                error -> Log.e("Network", "fail")
-        ) {
-            @Override
-            public byte[] getBody() {
-                JSONObject jsonObject = new JSONObject();
-                try {
-                    jsonObject.put("username", username.getText().toString());
-                    jsonObject.put("password", password.getText().toString());
-                } catch (JSONException e) {
-                    throw new RuntimeException(e);
-                }
-                return jsonObject.toString().getBytes();
-            }
-
-            @Override
-            public String getBodyContentType() {
-                return "application/json";
-            }
-        };
-        queue.add(stringRequest);
+    public byte[] getBody() {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("username", username.getText().toString());
+            jsonObject.put("password", password.getText().toString());
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        return jsonObject.toString().getBytes();
     }
-
 
     private boolean allFieldsAreFilled() {
         if (username.getText().toString().isEmpty()) {
