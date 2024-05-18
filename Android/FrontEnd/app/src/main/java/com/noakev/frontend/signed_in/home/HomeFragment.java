@@ -52,7 +52,7 @@ public class HomeFragment extends Fragment {
 
     public void getPostsFromBackEnd() {
         BackEndCommunicator communicator = new BackEndCommunicator();
-        communicator.sendRequest(0, "/event/get_following/get_events/", null, getContext(), new ResponseListener() {
+        communicator.sendRequest(0, "/user/get_following/get_events", null, getContext(), new ResponseListener() {
             @Override
             public void onSucces(APIObject apiObject) {
                 /*
@@ -66,7 +66,6 @@ public class HomeFragment extends Fragment {
                 adapter.setLocalData(data);
                  */
             }
-
             @Override
             public void onError(APIObject apiObject) {
 

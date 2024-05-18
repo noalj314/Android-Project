@@ -65,20 +65,18 @@ public class SignInFragment extends Fragment {
         BackEndCommunicator communicator = new BackEndCommunicator();
         communicator.sendRequest(1, route, getBody(), getContext(), new ResponseListener() {
             public void onSucces(APIObject apiObject) {
-                Log.e("RESPONSE", apiObject.getToken()+" : "+username.getText().toString());
-                GlobalUser.setToken(apiObject.getToken());
-                GlobalUser.setUsername(username.getText().toString());
-                SignedOutActivity mainActivity = (SignedOutActivity)(getActivity());
-                mainActivity.navigateHome();
-                Toast.makeText(getContext(), "LOGIN SUCCESSFUL", Toast.LENGTH_SHORT).show();
-            }
-
-            public void onError(APIObject apiObject) {
-                if (apiObject.getToken().isEmpty()) {
-                    Toast.makeText(getContext(), "no such user!!!", Toast.LENGTH_SHORT).show();
+                Log.v("RESPONSE", apiObject.getToken()+" : "+username.getText().toString());
+                if (apiObject.statusFail()) {
+                    Toast.makeText(getContext(), "Wrong username or password", Toast.LENGTH_SHORT).show();
+                } else {
+                    GlobalUser.setToken(apiObject.getToken());
+                    GlobalUser.setUsername(username.getText().toString());
+                    SignedOutActivity mainActivity = (SignedOutActivity)(getActivity());
+                    mainActivity.navigateHome();
+                    Toast.makeText(getContext(), "LOGIN SUCCESSFUL", Toast.LENGTH_SHORT).show();
                 }
-                Log.e("Network", "fail");
             }
+            public void onError(APIObject apiObject) { Log.e("Network", "fail"); }
         });
     }
 

@@ -59,7 +59,6 @@ public class ProfileFragment extends Fragment implements ClickListener {
         usernameTv = binding.username;
         followBtn = binding.followbtn;
 
-
         if (getArguments() != null) {
             currentAccount = getArguments().getString("username");
             if (!Objects.equals(currentAccount, currentUser)) {
@@ -89,8 +88,6 @@ public class ProfileFragment extends Fragment implements ClickListener {
         followBtn.setOnClickListener(v -> {
             String input = "";
             BackEndCommunicator communicator = new BackEndCommunicator();
-            Log.v("fuck", followBtn.getText().toString());
-            Log.v("fuck", input);
 
             if (followBtn.getText().toString().equals("follow")) {
                 input = "follow";

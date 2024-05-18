@@ -6,6 +6,7 @@ import com.noakev.frontend.signed_in.profile.User;
 import java.util.ArrayList;
 
 public class APIObject {
+    private String status;
     private String username;
     private String password;
     private String description;
@@ -54,5 +55,8 @@ public class APIObject {
 
     public ArrayList<String> getGrupper() {
         return grupper;
+    }
+    public boolean statusFail() {
+        return status.equals("fail");
     }
 }

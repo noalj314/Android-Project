@@ -53,8 +53,6 @@ public class CreateUserFragment extends Fragment {
             if (allFieldsAreFilled()) {
                 Toast.makeText(getContext(), "Creating user...", Toast.LENGTH_SHORT).show();
                 saveUser();
-                SignedOutActivity mainActivity = (SignedOutActivity)(getActivity());
-                mainActivity.navigateToSignIn();
             } else {
                 Toast.makeText(getContext(), "Fill out all fields.", Toast.LENGTH_SHORT).show();
             }
@@ -67,7 +65,14 @@ public class CreateUserFragment extends Fragment {
         BackEndCommunicator communicator = new BackEndCommunicator();
         communicator.sendRequest(1, "/user/create", createBody(), getContext(), new ResponseListener() {
             @Override
-            public void onSucces(APIObject apiObject) {}
+            public void onSucces(APIObject apiObject) {
+                if (apiObject.statusFail()) {
+                    Toast.makeText(getContext(), "Username taken", Toast.LENGTH_SHORT).show();
+                } else {
+                    SignedOutActivity mainActivity = (SignedOutActivity) (getActivity());
+                    mainActivity.navigateToSignIn();
+                }
+            }
             @Override
             public void onError(APIObject apiObject) {
             }
