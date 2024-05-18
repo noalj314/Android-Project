@@ -42,7 +42,6 @@ def test_create_user1(client):
     data = {
         'username': 'user1',
         'password': 'user1',
-        'description': 'Sucks dick'
     }
     response = client.post('/user/create', json=data)
     assert response.status_code == 200
@@ -53,7 +52,6 @@ def test_create_user2(client):
     data = {
         'username': 'user2',
         'password': 'user2',
-        'description': 'Sucks more dick'
     }
     response = client.post('/user/create', json=data)
     assert response.status_code == 200
@@ -103,15 +101,14 @@ def test_unfollow(client, test_login, test_login_user_2):
 def test_create_event(client, test_login):
     jwt_token = test_login
     event_data = {
-        "title": "Test Event",
+        "username":"user1",
         "description": "This is a test event",
         "location": "Test Location",
-        "date": "12",
-        "photo" : "cock"
+        "photo" : "Test photo"
     }
     response = client.post('/event/create', headers={'Authorization': f'Bearer {jwt_token}'},
                            json=event_data)
-    assert response.status_code == 200
+    assert response.status_code == 201
 
 
 def test_follow_event(client, test_login_user_2):

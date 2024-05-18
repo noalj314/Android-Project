@@ -144,36 +144,44 @@ def get_following(user):
     return jsonify({"following":[u.username for u in user_to_check.follows]}), 200
 
 
-@app.route('/user/check_following/<user>', methods=['POST'])
+@app.route('/user/check_following/<username>', methods=['GET'])
 @jwt_required()
-def check_following(user):
-    """Check if the user is followed."""
+def check_following(username):
+    """Check if the current user is following the specified user."""
     current_user_id = get_jwt_identity()
     current_user = User.query.filter_by(id=current_user_id).first()
-    user_to_check = User.query.filter_by(username=user).first()
 
-    if user_to_check in current_user.follows:
-        return jsonify({'message': "true"}), 200
-    elif user_to_check not in current_user.follows:
-        return jsonify({'message': "false"}), 200
+    if current_user is None:
+        return jsonify({'message': 'Current user not found'}), 404
+
+    user_to_check = User.query.filter_by(username=username).first()
+
+    if user_to_check is None:
+        return jsonify({'message': 'User to check not found'}), 404
+
+    is_following = user_to_check in current_user.follows
+    return jsonify({'message': str(is_following).lower()}), 200
+
+
         
 
 #--------------Events----------------#
 
 @app.route('/event/create', methods=['POST'])
-@jwt_required()
+#@jwt_required()
 def create_event():
     event_data = request.get_json()
 
     try:
-        # Retrieve the user from the database
-        username = event_data['username']
-        user = User.query.filter_by(username=username).first()
-
+        # Retrieve the user by username
+        user = User.query.filter_by(username=event_data['username']).first()
+        if user is None:
+            return jsonify({'message': 'User not found'}), 404
+        
         # Create the event
         event = Event(
             username=event_data['username'],
-            user_id=user.id, 
+            user_id=user.id,
             location=event_data['location'], 
             description=event_data['description'],
             photo=event_data.get('photo')  # Use get() to handle optional field
@@ -189,7 +197,8 @@ def create_event():
         missing_field = e.args[0]
         return jsonify({'message': f'Missing required data: {missing_field}'}), 400
     except Exception as e:
-        logging.exception("An error occurred while creating the event")
+        print("An error occurred while creating the event")
+        print(event_data)
         return jsonify({'message': 'An error occurred'}), 500
 
 
@@ -299,8 +308,10 @@ def get_events_from_following():
     """Get all events from all users the current user follows."""
     current_user_id = get_jwt_identity()
     events = []
+    
     for u in get_following(current_user_id):
         events += u.created_events
+    
     return jsonify([event.to_dict() for event in events]), 200
 
 

@@ -40,8 +40,7 @@ event_going = db.Table('event_going',
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
-    photo = db.Column(db.String(200), nullable=True)  # add default later
-    description = db.Column(db.String(200), nullable=False)
+    #photo = db.Column(db.String(200), nullable=True)  # add default later
     password = db.Column(db.String, nullable=False)
 
     # Relationships
@@ -66,10 +65,7 @@ class User(db.Model):
     def to_dict(self):
         return {
             'id': self.id,
-            'username': self.username,
-            'email': self.email,
-            'description': self.description,
-            'photo': self.photo
+            'username': self.username
         }
 
     def username_to_dict(self):
@@ -77,19 +73,18 @@ class User(db.Model):
             'username': self.username
         }
 
-    def __init__(self, username, password, description):
-        self.description = description
+    def __init__(self, username, password):
         self.username = username
         self.password = bcrypt.generate_password_hash(password).decode('utf-8')
 
 
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    username = db.Column(db.String(20), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     location = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(200), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    photo = db.Column(db.String(200), nullable=True, default=None)  # no default
-    username = db.Column(db.String(20), nullable=False)
+    photo = db.Column(db.String(200), nullable=False)  # no default
 
     # Relationships
 
@@ -101,12 +96,17 @@ class Event(db.Model):
     def event_to_dict(self):
         return {
             'id': self.id,
-            'title': self.title,
             'created_by_user_id': self.created_by_user_id,
             'location': self.location,
-            'date': self.date,
             'description': self.description
         }
+    
+    def __init__(self, username, user_id, description, location, photo):
+        self.username = username
+        self.user_id = user_id
+        self.description = description
+        self.location = location
+        self.photo = photo
 
 
 class Comment(db.Model):
