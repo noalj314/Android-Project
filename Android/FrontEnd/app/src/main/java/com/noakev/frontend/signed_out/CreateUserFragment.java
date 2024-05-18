@@ -21,6 +21,8 @@ import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.noakev.frontend.R;
 import com.noakev.frontend.backend.APIObject;
+import com.noakev.frontend.backend.BackEndCommunicator;
+import com.noakev.frontend.backend.ResponseListener;
 import com.noakev.frontend.databinding.FragmentCreateUserBinding;
 import com.noakev.frontend.databinding.FragmentSignInBinding;
 import com.noakev.frontend.signed_in.profile.Groups;
@@ -36,9 +38,6 @@ import java.util.Map;
 import java.util.Objects;
 
 public class CreateUserFragment extends Fragment {
-    public interface DataFetchedCallbackCreate {
-        void onDataFetched();
-    }
     private TextView username;
     private TextView password;
     @Override
@@ -46,8 +45,8 @@ public class CreateUserFragment extends Fragment {
                              Bundle savedInstanceState) {
         FragmentCreateUserBinding binding = FragmentCreateUserBinding.inflate(getLayoutInflater(), container, false);
 
-        username = (TextView) binding.usernametext;
-        password = (TextView) binding.passwordtext;
+        username = binding.usernametext;
+        password = binding.passwordtext;
 
         Button register = binding.registerbtn;
         register.setOnClickListener(v -> {
@@ -65,52 +64,25 @@ public class CreateUserFragment extends Fragment {
     }
 
     private void saveUser() {
-        getDataVolley("http://10.0.2.2:5000/user/create", () -> {
+        BackEndCommunicator communicator = new BackEndCommunicator();
+        communicator.sendRequest(1, "/user/create", createBody(), getContext(), new ResponseListener() {
+            @Override
+            public void onSucces(APIObject apiObject) {}
+            @Override
+            public void onError(APIObject apiObject) {
+            }
         });
     }
-    public void getDataVolley(String url, DataFetchedCallbackCreate callback) {
-        // Instantiate the RequestQueue.
-        RequestQueue queue = Volley.newRequestQueue(getContext());
-
-        // Request a string response from the provided URL.
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                response -> {
-                },
-                volleyError -> {
-                    if (volleyError.getClass() == com.android.volley.ClientError.class) {
-                        // Get byte array from response data
-                        byte[] byteArray = volleyError.networkResponse.data;
-
-                        // Convert byte array to APIObject using Gson
-                        Gson gson = new Gson();
-                        String jsonStringFromByteArray = new String(byteArray, StandardCharsets.UTF_8);
-                        APIObject errorResponse = gson.fromJson(jsonStringFromByteArray, APIObject.class);
-                    } else {
-                        Log.e("NETWORK", "Network error.");
-                        volleyError.printStackTrace();
-
-                    }
-                }) {
-            @Override
-            public byte[] getBody() {
-                JSONObject jsonObject = new JSONObject();
-                try {
-                    jsonObject.put("username", username.getText().toString());
-                    jsonObject.put("password", password.getText().toString());
-                    jsonObject.put("description", "hejsan");
-                } catch (JSONException e) {
-                    throw new RuntimeException(e);
-                }
-
-                return jsonObject.toString().getBytes();
-            }
-
-            @Override
-            public String getBodyContentType() {
-                return "application/json";
-            }
-        };
-        queue.add(stringRequest);
+    public byte[] createBody() {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("username", username.getText().toString());
+            jsonObject.put("password", password.getText().toString());
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        Log.v("JSON", jsonObject.toString());
+        return jsonObject.toString().getBytes();
     }
 
     private boolean allFieldsAreFilled() {
@@ -119,10 +91,3 @@ public class CreateUserFragment extends Fragment {
         } else return !username.getText().toString().isEmpty();
     }
 }
-
-/*
-
-                        newUser.put("username", String.valueOf(username.getText()));
-                        newUser.put("password", String.valueOf(password.getText()));
-                        newUser.put("description", "something");
- */

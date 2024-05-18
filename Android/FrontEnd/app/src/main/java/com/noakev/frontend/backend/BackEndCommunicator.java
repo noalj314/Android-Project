@@ -13,31 +13,33 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class BackEndCommunicator {
-    private String url = "http://10.0.2.2:5000";
+    private final String URL = "http://10.0.2.2:5000";
     public void sendRequest(int requestMethod, String route, byte[] jsonObject, Context context, ResponseListener listener) {
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(context);
         Gson gson = new Gson();
 
         // Request a string response from the provided URL.
-        StringRequest stringRequest = new StringRequest(requestMethod, url+route,
+        StringRequest stringRequest = new StringRequest(requestMethod, URL +route,
                 response -> {
                     // Display the response string.
-                    Log.e("RESPONSE", response.toString());
                     APIObject apiObject = gson.fromJson(response, APIObject.class);
+                    Log.v("RESPONSE", response.toString());
+                    //Log.v("RESPONSE", apiObject.getMessage());
                     listener.onSucces(apiObject);
                 },
                 error -> {
                     APIObject apiObject = gson.fromJson(String.valueOf(error), APIObject.class);
-                    Log.v("fail", String.valueOf(error));
+                    Log.e("FAIL", String.valueOf(error));
+                    //Log.e("FAIL", apiObject.getMessage());
                     listener.onError(apiObject);
                 }
         ) {
             @Override
             public Map<String, String> getHeaders() {
-                Map<String, String> header = new HashMap<>();
-                header.put("Authorization","Bearer "+GlobalUser.getToken());
-                return header;
+                Map<String, String> params = new HashMap<>();
+                params.put("Authorization", "Bearer " + GlobalUser.getToken());
+                return params;
             }
 
             @Override

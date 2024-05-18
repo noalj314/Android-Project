@@ -40,8 +40,8 @@ public class SignInFragment extends Fragment {
                              Bundle savedInstanceState) {
         FragmentSignInBinding binding = FragmentSignInBinding.inflate(getLayoutInflater(), container, false);
 
-        username = (TextView) binding.usernametext;
-        password = (TextView) binding.passwordtext;
+        username = binding.usernametext;
+        password = binding.passwordtext;
 
         Button loginbtn = binding.loginbtn;
         loginbtn.setOnClickListener(v -> {
@@ -65,6 +65,7 @@ public class SignInFragment extends Fragment {
         BackEndCommunicator communicator = new BackEndCommunicator();
         communicator.sendRequest(1, route, getBody(), getContext(), new ResponseListener() {
             public void onSucces(APIObject apiObject) {
+                Log.e("RESPONSE", apiObject.getToken()+" : "+username.getText().toString());
                 GlobalUser.setToken(apiObject.getToken());
                 GlobalUser.setUsername(username.getText().toString());
                 SignedOutActivity mainActivity = (SignedOutActivity)(getActivity());

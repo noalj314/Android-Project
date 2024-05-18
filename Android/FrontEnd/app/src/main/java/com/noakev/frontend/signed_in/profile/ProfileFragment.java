@@ -45,10 +45,6 @@ public class ProfileFragment extends Fragment implements ClickListener {
     private Adapter followingAdapter;
     private Button followBtn;
     private TextView usernameTv;
-    public interface DataFetchedCallback {
-        void onDataFetched(Groups groups);
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,23 +59,15 @@ public class ProfileFragment extends Fragment implements ClickListener {
         usernameTv = binding.username;
         followBtn = binding.followbtn;
 
+
         if (getArguments() != null) {
             currentAccount = getArguments().getString("username");
             if (!Objects.equals(currentAccount, currentUser)) {
                 usernameTv.setText(currentAccount);
                 userIsFollowed();
-            } else {
-                currentAccount = currentUser;
-                usernameTv.setText(currentAccount);
-                binding.followbtn.setVisibility(View.INVISIBLE);
-            }
+            } else { sameUser(); }
             setArguments(null);
-            //Check following
-        } else {
-            currentAccount = currentUser;
-            usernameTv.setText(currentAccount);
-            binding.followbtn.setVisibility(View.INVISIBLE);
-        }
+        } else { sameUser(); }
 
         RecyclerView followerRv = binding.groups;
         followerRv.setHasFixedSize(true);
@@ -127,6 +115,11 @@ public class ProfileFragment extends Fragment implements ClickListener {
         return binding.getRoot();
     }
 
+    private void sameUser() {
+        currentAccount = currentUser;
+        usernameTv.setText(currentAccount);
+        binding.followbtn.setVisibility(View.INVISIBLE);
+    }
 
     private void getFollowers() {
         BackEndCommunicator communicator = new BackEndCommunicator();
@@ -163,13 +156,13 @@ public class ProfileFragment extends Fragment implements ClickListener {
 
     private void userIsFollowed() {
         BackEndCommunicator communicator = new BackEndCommunicator();
-        communicator.sendRequest(1, "/user/check_following/"+currentAccount, null, getContext(), new ResponseListener() {
+        communicator.sendRequest(0, "/user/check_following/"+currentAccount, null, getContext(), new ResponseListener() {
             @Override
             public void onSucces(APIObject apiObject) {
                 Log.v("Response", apiObject.getMessage());
                 if (Objects.equals(apiObject.getMessage(), "true")) {
                     binding.followbtn.setText("unfollow");
-                } else if (apiObject.getMessage() == "false") {
+                } else if (Objects.equals(apiObject.getMessage(), "false")) {
                     binding.followbtn.setText("follow");
                 }
             }
