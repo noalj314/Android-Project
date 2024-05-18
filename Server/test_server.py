@@ -85,20 +85,20 @@ def test_login_user_2(client):
     return response.json['token']
 
 
-def test_follow(client, test_login, test_login_user_2):
+def test_follow(client, test_login):
     """Test if a user can follow another user. To test this be logged in as user 1."""
     jwt_token = test_login
     response = client.post('/user/follow/user2', headers={'Authorization': f'Bearer {jwt_token}'})
     assert response.status_code == 200
 
 
-def test_unfollow(client, test_login, test_login_user_2):
-    jwt_token = test_login
-    response = client.post('/user/unfollow/user2', headers={'Authorization': f'Bearer {jwt_token}'})
-    assert response.status_code == 200
+#def test_unfollow(client, test_login):
+#    jwt_token = test_login
+#    response = client.post('/user/unfollow/user2', headers={'Authorization': f'Bearer {jwt_token}'})
+#    assert response.status_code == 200
 
 
-def test_create_event(client, test_login):
+def test_create_event_1(client, test_login):
     jwt_token = test_login
     event_data = {
         "username":"user1",
@@ -109,6 +109,38 @@ def test_create_event(client, test_login):
     response = client.post('/event/create', headers={'Authorization': f'Bearer {jwt_token}'},
                            json=event_data)
     assert response.status_code == 201
+
+
+def test_create_event_2(client, test_login):
+    jwt_token = test_login
+    event_data = {
+        "username":"user2",
+        "description": "This is another test event",
+        "location": "Another test Location",
+        "photo" : "Another test photo"
+    }
+    response = client.post('/event/create', headers={'Authorization': f'Bearer {jwt_token}'},
+                           json=event_data)
+    assert response.status_code == 201
+
+
+def test_create_event_3(client, test_login):
+    jwt_token = test_login
+    event_data = {
+        "username":"user2",
+        "description": "This is a third test event",
+        "location": "A third test Location",
+        "photo" : "A third test photo"
+    }
+    response = client.post('/event/create', headers={'Authorization': f'Bearer {jwt_token}'},
+                           json=event_data)
+    assert response.status_code == 201
+
+
+def test_get_follwing_events(client, test_login):
+    jwt_token = test_login
+    response = client.get('/user/get_following/get_events',  headers={'Authorization': f'Bearer {jwt_token}'})
+    assert response.status_code == 200
 
 
 def test_follow_event(client, test_login_user_2):

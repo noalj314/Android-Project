@@ -72,6 +72,10 @@ class User(db.Model):
         return {
             'username': self.username
         }
+    
+    def add_event(self, event):
+        self.created_events.append(event)
+        db.session.commit()
 
     def __init__(self, username, password):
         self.username = username
@@ -93,10 +97,9 @@ class Event(db.Model):
     event_followed_by = db.relationship('User', secondary=event_followed,
                                         back_populates="followed_events", lazy='dynamic')
 
-    def event_to_dict(self):
+    def to_dict(self):
         return {
-            'id': self.id,
-            'created_by_user_id': self.created_by_user_id,
+            'username': self.username,
             'location': self.location,
             'description': self.description
         }

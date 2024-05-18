@@ -32,12 +32,12 @@ def create_user():
     u = User.query.filter_by(username=username).first()
 
     if u is not None:
-        return jsonify({'status': 'fail', 'message': "username taken"}), 400
+        return jsonify({'status': 'fail', 'message': "username taken"}), 200
     
     u = User(username=username, password=password)
     db.session.add(u)
     db.session.commit()
-    return "", 200
+    return jsonify({'status': 'success'}), 200
 
 
 @app.route('/user/login', methods=['POST'])
@@ -49,12 +49,12 @@ def user_login():
     u = User.query.filter_by(username=username).first()
 
     if u is None:
-        return jsonify({'message': 'No such user or wrong password', 'status': 'fail'}), 400
+        return jsonify({'message': 'No such user or wrong password', 'status': 'fail'}), 200
     elif bcrypt.check_password_hash(u.password, password):
         access_token = create_access_token(identity=u.id, expires_delta=datetime.timedelta(hours=1))
-        return jsonify({'token' : access_token}), 200
+        return jsonify({'token' : access_token, 'status': 'success'}), 200
     else:
-        return jsonify({'message': 'No such user or wrong password', 'status': 'fail'}), 400
+        return jsonify({'message': 'No such user or wrong password', 'status': 'fail'}), 200
 
 
 @app.route('/user/logout', methods=['POST'])
@@ -163,7 +163,6 @@ def check_following(username):
     return jsonify({'message': str(is_following).lower()}), 200
 
 
-        
 
 #--------------Events----------------#
 
@@ -186,6 +185,8 @@ def create_event():
             description=event_data['description'],
             photo=event_data.get('photo')  # Use get() to handle optional field
         )
+
+        user.add_event(event)
 
         # Add the event to the session and commit
         db.session.add(event)
@@ -299,6 +300,7 @@ def uncomment_event(comment_id):
 def get_events():
     """Get all events."""
     events = Event.query.all()
+
     return jsonify({"events" : [event.to_dict() for event in events]}), 200
 
 
@@ -307,12 +309,13 @@ def get_events():
 def get_events_from_following():
     """Get all events from all users the current user follows."""
     current_user_id = get_jwt_identity()
+    user = User.query.filter_by(id=current_user_id).first()
     events = []
     
-    for u in get_following(current_user_id):
-        events += u.created_events
+    for followed in user.follows:
+        events += followed.created_events
     
-    return jsonify([event.to_dict() for event in events]), 200
+    return jsonify({"events" : [event.to_dict() for event in events]}), 200
 
 
 if __name__ == '__main__':
