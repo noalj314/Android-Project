@@ -32,12 +32,12 @@
                     android:layout_marginStart="50dp"
                     android:orientation="vertical"
                     >
+
                     <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
                         android:id="@+id/username"
-                        android:text="username"
-                        />
+                        android:layout_width="68dp"
+                        android:layout_height="wrap_content"
+                        android:text="username" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

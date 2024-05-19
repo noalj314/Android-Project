@@ -3,24 +3,11 @@ package com.noakev.frontend.signed_in.event;
 import com.noakev.frontend.signed_in.profile.User;
 
 public class Event {
-    /*
-            'id': self.id,
-            'title': self.title,
-            'created_by_user_id': self.created_by_user_id,
-            'location': self.location,
-            'date': self.date,
-            'description': self.description
-     */
-    private User username;
+    private String event_id;
+    private String username;
     private String photo;
     private String location;
     private String description;
-
-    public Event(String photo, String location, String description) {
-        this.photo = photo;
-        this.location = location;
-        this.description = description;
-    }
 
     public Event() {
     }
@@ -37,6 +24,13 @@ public class Event {
         return photo;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public String getEvent_id() {
+        return event_id;
+    }
 
     public String getDescription() {
         return description;

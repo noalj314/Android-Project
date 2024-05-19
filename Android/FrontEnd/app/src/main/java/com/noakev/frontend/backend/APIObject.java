@@ -1,5 +1,6 @@
 package com.noakev.frontend.backend;
 
+import com.noakev.frontend.signed_in.comment.Comment;
 import com.noakev.frontend.signed_in.event.Event;
 import com.noakev.frontend.signed_in.profile.User;
 
@@ -13,6 +14,7 @@ public class APIObject {
     private String token;
     private String message;
     private ArrayList<Event> events;
+    private ArrayList<Comment> comments;
     private ArrayList<String> followers;
     private ArrayList<String> following;
     private ArrayList<String> users_liked;
@@ -39,6 +41,9 @@ public class APIObject {
 
     public ArrayList<Event> getEvents() {
         return events;
+    }
+    public ArrayList<Comment> getComments() {
+        return comments;
     }
 
     public ArrayList<String> getFollowersList() {

@@ -37,6 +37,8 @@ import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.noakev.frontend.GlobalUser;
 import com.noakev.frontend.backend.APIObject;
+import com.noakev.frontend.backend.BackEndCommunicator;
+import com.noakev.frontend.backend.ResponseListener;
 import com.noakev.frontend.databinding.FragmentEventBinding;
 import com.noakev.frontend.signed_in.HomeActivity;
 import com.noakev.frontend.signed_out.SignInFragment;
@@ -98,12 +100,7 @@ public class EventFragment extends Fragment {
     private void createNewPost() {
         if (allColumnsAreFilled()) {
             Toast.makeText(getContext(), "Creating post...", Toast.LENGTH_SHORT).show();
-            getDataVolley("http://10.0.2.2:5000/event/create", () -> {
-                Toast.makeText(getContext(), "Successfully created post.", Toast.LENGTH_SHORT).show();
-                HomeActivity homeActivity = (HomeActivity)(getActivity());
-                homeActivity.navigateHome();
-            });
-            // Save to database
+            saveEventToBackend();
         } else {
             Toast.makeText(getContext(), "Insufficient information!", Toast.LENGTH_SHORT).show();
         }
@@ -120,51 +117,38 @@ public class EventFragment extends Fragment {
         return true;
     }
 
-    public void getDataVolley(String url, SignInFragment.DataFetchedCallbackSign callback) {
-        // Instantiate the RequestQueue.
-        RequestQueue queue = Volley.newRequestQueue(getContext());
+    private void saveEventToBackend() {
+        BackEndCommunicator communicator = new BackEndCommunicator();
+        communicator.sendRequest(1, "/event/create", createBody(), getContext(), new ResponseListener() {
+            @Override
+            public void onSucces(APIObject apiObject) {
+                Toast.makeText(getContext(), "Successfully created post.", Toast.LENGTH_SHORT).show();
+                HomeActivity homeActivity = (HomeActivity)(getActivity());
+                homeActivity.navigateHome();
+            }
 
-        // Request a string response from the provided URL.
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                response -> {
-                    callback.onDataFetched();
-                },
-                error -> {
-                    if (error.getClass() == com.android.volley.ClientError.class) {
-                        // Get byte array from response data
-                        byte[] byteArray = error.networkResponse.data;
+            @Override
+            public void onError(APIObject apiObject) {}
+        });
+    }
 
-                        // Convert byte array to APIObject using Gson
-                        Gson gson = new Gson();
+/*
                         String jsonStringFromByteArray = new String(byteArray, StandardCharsets.UTF_8);
                         APIObject errorResponse = gson.fromJson(jsonStringFromByteArray, APIObject.class);
-                    } else {
-                        Log.e("NETWORK", "Network error.");
-                        error.printStackTrace();
+ */
 
-                    }
-                }) {
-            @Override
-            public byte[] getBody() {
-                JSONObject jsonObject = new JSONObject();
-                try {
-                    jsonObject.put("username", currentUser);
-                    jsonObject.put("location", binding.location.getText().toString());
-                    jsonObject.put("description", binding.description.getText().toString());
-                    jsonObject.put("photo", getImageAsString());
-                } catch (JSONException e) {
-                    throw new RuntimeException(e);
-                }
-                Log.v("JSON", jsonObject.toString());
-                return jsonObject.toString().getBytes();
-            }
-
-            @Override
-            public String getBodyContentType() {
-                return "application/json";
-            }
-        };
-        queue.add(stringRequest);
+    private byte[] createBody() {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("username", currentUser);
+            jsonObject.put("location", binding.location.getText().toString());
+            jsonObject.put("description", binding.description.getText().toString());
+            jsonObject.put("photo", getImageAsString());
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        Log.v("JSON", jsonObject.toString());
+        return jsonObject.toString().getBytes();
     }
 
     private void askForLocation() {

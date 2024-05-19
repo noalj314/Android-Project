@@ -65,7 +65,6 @@ public class SignInFragment extends Fragment {
         BackEndCommunicator communicator = new BackEndCommunicator();
         communicator.sendRequest(1, route, getBody(), getContext(), new ResponseListener() {
             public void onSucces(APIObject apiObject) {
-                Log.v("RESPONSE", apiObject.getToken()+" : "+username.getText().toString());
                 if (apiObject.statusFail()) {
                     Toast.makeText(getContext(), "Wrong username or password", Toast.LENGTH_SHORT).show();
                 } else {

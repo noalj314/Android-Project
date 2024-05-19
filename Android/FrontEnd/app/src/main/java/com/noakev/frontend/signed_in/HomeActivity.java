@@ -14,7 +14,11 @@ import android.os.Bundle;
 
 import com.google.android.material.navigation.NavigationView;
 import com.noakev.frontend.R;
+import com.noakev.frontend.signed_in.comment.CommentFragmentDirections;
+import com.noakev.frontend.signed_in.event.Adapter;
 import com.noakev.frontend.signed_in.event.EventFragmentDirections;
+import com.noakev.frontend.signed_in.home.HomeFragment;
+import com.noakev.frontend.signed_in.home.HomeFragmentDirections;
 import com.noakev.frontend.signed_in.profile.ProfileFragmentDirections;
 import com.noakev.frontend.signed_in.search.SearchFragmentDirections;
 
@@ -56,13 +60,28 @@ public class HomeActivity extends AppCompatActivity {
         Navigation.findNavController(this, R.id.fragment_container).navigate(action);
     }
 
+    public void navigateHomeFromComment() {
+        NavDirections action = CommentFragmentDirections.actionCommentFragmentToHomeFragment();
+        Navigation.findNavController(this, R.id.fragment_container).navigate(action);
+    }
+
     public void navigateToProfile(String username) {
         NavDirections action = SearchFragmentDirections.actionSearchFragmentToProfileFragment(username);
         Navigation.findNavController(this, R.id.fragment_container).navigate(action);
     }
 
+   public void navigateToProfileFromComment(String username) {
+        NavDirections action = CommentFragmentDirections.actionCommentFragmentToProfileFragment(username);
+        Navigation.findNavController(this, R.id.fragment_container).navigate(action);
+    }
+
     public void navigateToSelf(String username) {
         NavDirections action = ProfileFragmentDirections.actionProfileFragmentSelf(username);
+        Navigation.findNavController(this, R.id.fragment_container).navigate(action);
+    }
+
+    public void navigateToComment(String eventID) {
+        NavDirections action = HomeFragmentDirections.actionHomeFragmentToCommentFragment(eventID);
         Navigation.findNavController(this, R.id.fragment_container).navigate(action);
     }
 }

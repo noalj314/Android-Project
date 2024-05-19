@@ -31,7 +31,7 @@ public class HomeFragment extends Fragment {
     private ArrayList<HashMap> data;
     private FragmentHomeBinding binding;
     private RecyclerView recyclerView;
-    private Posts events;
+    private ArrayList<Event> events;
     private Adapter adapter;
 
     @Override
@@ -41,11 +41,11 @@ public class HomeFragment extends Fragment {
 
         RecyclerView rv = binding.posts;
         data = new ArrayList<>();
-        Adapter adapter = new Adapter();
+        adapter = new Adapter();
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
         rv.setAdapter(adapter);
 
-        //getPostsFromBackEnd();
+        getPostsFromBackEnd();
 
         return binding.getRoot();
     }
@@ -55,20 +55,22 @@ public class HomeFragment extends Fragment {
         communicator.sendRequest(0, "/user/get_following/get_events", null, getContext(), new ResponseListener() {
             @Override
             public void onSucces(APIObject apiObject) {
-                /*
-                int i = 0;
-                for (Event event : events.getEvents()) {
+                events = apiObject.getEvents();
+                for (Event event : events) {
                     HashMap<String, String> deats = new HashMap<>();
-                    deats.put("id", "dW"+i);
+                    deats.put("id", event.getEvent_id());
+                    deats.put("username", event.getUsername());
+                    deats.put("description", event.getDescription());
+                    deats.put("location", event.getLocation());
+                    deats.put("photo", event.getPhoto());
                     data.add(deats);
-                    i++;
                 }
-                adapter.setLocalData(data);
-                 */
+                adapter.setLocalData(data, getContext(), getActivity());
             }
             @Override
             public void onError(APIObject apiObject) {
 
+                Log.v("RESPONSE", apiObject.getEvents().toString());
             }
         });
     }

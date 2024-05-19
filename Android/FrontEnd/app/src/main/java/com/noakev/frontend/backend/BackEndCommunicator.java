@@ -22,16 +22,13 @@ public class BackEndCommunicator {
         // Request a string response from the provided URL.
         StringRequest stringRequest = new StringRequest(requestMethod, URL +route,
                 response -> {
-                    // Display the response string.
                     APIObject apiObject = gson.fromJson(response, APIObject.class);
                     Log.v("RESPONSE", response.toString());
-                    //Log.v("RESPONSE", apiObject.getMessage());
                     listener.onSucces(apiObject);
                 },
                 error -> {
                     APIObject apiObject = gson.fromJson(String.valueOf(error), APIObject.class);
-                    Log.e("FAIL", String.valueOf(error));
-                    //Log.e("FAIL", apiObject.getMessage());
+                    Log.e("RESPONSE", error.toString());
                     listener.onError(apiObject);
                 }
         ) {
