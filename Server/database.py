@@ -99,24 +99,28 @@ class Event(db.Model):
 
     def to_dict(self):
         return {
+            'event_id': self.id,
             'username': self.username,
             'location': self.location,
-            'description': self.description
+            'description': self.description,
+            'photo' : self.photo 
         }
-    
-    def __init__(self, username, user_id, description, location, photo):
-        self.username = username
-        self.user_id = user_id
-        self.description = description
-        self.location = location
-        self.photo = photo
 
 
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    text = db.Column(db.String(200), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
+    text = db.Column(db.String(200), nullable=False)
+
+    def to_dict(self):
+        username = User.query.filter_by(id=self.user_id).first().username
+        return {
+            'id': self.id,
+            'username': username,
+            'event_id': self.event_id,
+            'text': self.text,
+        }
 
 
 class BlockedTokens(db.Model):

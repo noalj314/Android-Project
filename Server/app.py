@@ -141,7 +141,9 @@ def get_following(user):
     if user_to_check is None:
         return jsonify({'message': 'Faulty login'}), 200
     
-    return jsonify({"following":[u.username for u in user_to_check.follows]}), 200
+    following = [u.username for u in user_to_check.follows]
+    
+    return jsonify({"following" : following}), 200
 
 
 @app.route('/user/check_following/<username>', methods=['GET'])
@@ -167,7 +169,7 @@ def check_following(username):
 #--------------Events----------------#
 
 @app.route('/event/create', methods=['POST'])
-#@jwt_required()
+@jwt_required()
 def create_event():
     event_data = request.get_json()
 
@@ -183,7 +185,7 @@ def create_event():
             user_id=user.id,
             location=event_data['location'], 
             description=event_data['description'],
-            photo=event_data.get('photo')  # Use get() to handle optional field
+            photo=event_data['photo']
         )
 
         user.add_event(event)
@@ -237,7 +239,7 @@ def follow_event(event_id):
     elif current_user is None:
         return jsonify({'message': 'Faulty login'}), 404
     elif event_to_follow in current_user.followed_events:
-        return jsonify({'message': 'Already following'}), 400
+        return jsonify({'message': 'Already following'}), 200
     
     current_user.followed_events.append(event_to_follow)
     db.session.commit()
@@ -258,10 +260,11 @@ def unfollow_event(event_id):
     elif current_user is None:
         return jsonify({'message': 'Faulty login'}), 404
     elif event_to_unfollow not in current_user.followed_events:
-        return jsonify({'message': 'Not following'}), 400
+        return jsonify({'message': 'Not following'}), 200
     
     current_user.followed_events.remove(event_to_unfollow)
     db.session.commit()
+
     return jsonify({'message': f"{event_id} unfollowed"}), 200
 
 
@@ -270,16 +273,23 @@ def unfollow_event(event_id):
 def comment_event(event_id):
     """Comment an event by event id. Requires a jwt token."""
     user_id = get_jwt_identity()
+    user = User.query.filter_by(id=user_id).first()
+    username = user.username
+
     event = Event.query.filter_by(id=event_id).first()
-    if User.query.filter_by(id=user_id).first() is None:
+
+    if User is None:
         return jsonify({'message': 'No such user'}), 404
     if event is None:
         return jsonify({'message': 'No such event'}), 404
+    
     text = request.get_json()['text']
-    comment = Comment(text=text, user_id=user_id, event_id=event_id)
+    comment = Comment(text=text, user_id=user_id, event_id=event.id)
+
     db.session.add(comment)
     event.comments.append(comment)
     db.session.commit()
+
     return jsonify({'message': 'Comment added'}), 200
 
 
@@ -288,19 +298,39 @@ def comment_event(event_id):
 def uncomment_event(comment_id):
     """Uncomment an event by comment id. Requires a jwt token."""
     comment = Comment.query.filter_by(id=comment_id).first()
+
     if comment is not None and comment.user_id == get_jwt_identity():
         db.session.delete(comment)
         db.session.commit()
         return jsonify({'message': 'Comment removed'}), 200
     else:
         return jsonify({'message': 'No such comment or not authorized'}), 400
+    
+
+@app.route('/event/get_comments/<event_id>', methods=['GET'])
+@jwt_required()
+def get_comments(event_id):
+    """Get all comments for a post."""
+    try:
+        event = Event.query.filter_by(id=event_id).first()
+        
+        if event is None:
+            return jsonify({'message': 'No such event'}), 404
+        
+        comments = [comment.to_dict() for comment in event.comments.all()]
+
+        return jsonify({'comments': comments}), 200
+    
+    except Exception as e:
+        # Log the exception
+        logging.error(f"Error retrieving comments for event {event_id}: {e}")
+        return jsonify({'message': 'An error occurred while retrieving comments'}), 500
 
 
-@app.route('/event/get_events/', methods=['GET'])
+@app.route('/event/get_events', methods=['GET'])
 def get_events():
     """Get all events."""
     events = Event.query.all()
-
     return jsonify({"events" : [event.to_dict() for event in events]}), 200
 
 
@@ -314,6 +344,8 @@ def get_events_from_following():
     
     for followed in user.follows:
         events += followed.created_events
+
+    events += user.created_events
     
     return jsonify({"events" : [event.to_dict() for event in events]}), 200
 

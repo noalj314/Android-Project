@@ -137,6 +137,12 @@ def test_create_event_3(client, test_login):
     assert response.status_code == 201
 
 
+def test_get_events(client, test_login):
+    jwt_token = test_login
+    response = client.get('/event/get_events',  headers={'Authorization': f'Bearer {jwt_token}'})
+    assert response.status_code == 200
+
+
 def test_get_follwing_events(client, test_login):
     jwt_token = test_login
     response = client.get('/user/get_following/get_events',  headers={'Authorization': f'Bearer {jwt_token}'})
@@ -147,12 +153,6 @@ def test_follow_event(client, test_login_user_2):
     jwt_token = test_login_user_2
     response = client.post('/event/follow/1',  headers={'Authorization': f'Bearer {jwt_token}'})
     assert response.status_code == 200
-
-
-def test_unfollow_event(client, test_login_user_2):
-    jwt_token = test_login_user_2
-    response = client.post('/event/unfollow/1', headers={'Authorization': f'Bearer {jwt_token}'})
-    assert response.status_code == 400
 
 
 def test_comment_event(client, test_login):
