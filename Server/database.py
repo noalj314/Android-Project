@@ -105,6 +105,12 @@ class Event(db.Model):
             'description': self.description,
             'photo' : self.photo 
         }
+    
+    def size(self):
+        amount = 0
+        for user in self.event_followed_by:
+            amount += 1
+        return amount
 
 
 class Comment(db.Model):
@@ -117,7 +123,7 @@ class Comment(db.Model):
         username = User.query.filter_by(id=self.user_id).first().username
         return {
             'id': self.id,
-            'username': username,
+            'username':     username,
             'event_id': self.event_id,
             'text': self.text,
         }

@@ -164,7 +164,7 @@ def check_following(username):
     is_following = user_to_check in current_user.follows
     return jsonify({'message': str(is_following).lower()}), 200
 
-
+    
 
 #--------------Events----------------#
 
@@ -226,6 +226,26 @@ def delete_event(event_id):
     return jsonify({'message': 'Event deleted'}), 200
 
 
+@app.route('/event/check_following/<event_id>', methods=['GET'])
+@jwt_required()
+def check_event_following(event_id):
+    """Check if the current user is following the specified event."""
+    current_user_id = get_jwt_identity()
+    current_user = User.query.filter_by(id=current_user_id).first()
+    event = Event.query.filter_by(id=event_id).first()
+
+    if current_user is None:
+        return jsonify({'message': 'Current user not found'}), 404
+
+    if event is None:
+        return jsonify({'message': 'Event not found'}), 404
+
+    is_following = current_user in event.event_followed_by
+
+    return jsonify({'message': str(is_following).lower(),
+                     'amount_of_likes' : event.size()}), 200
+
+
 @app.route('/event/follow/<event_id>', methods=['POST'])
 @jwt_required()
 def follow_event(event_id):
@@ -252,7 +272,7 @@ def follow_event(event_id):
 def unfollow_event(event_id):
     """Unfollow an event by event id. Requires a jwt token."""
     current_user_id = get_jwt_identity()
-    event_to_unfollow = User.query.filter_by(id=event_id).first()
+    event_to_unfollow = Event.query.filter_by(id=event_id).first()
     current_user = User.query.filter_by(id=current_user_id).first()
 
     if event_to_unfollow is None:
@@ -260,7 +280,7 @@ def unfollow_event(event_id):
     elif current_user is None:
         return jsonify({'message': 'Faulty login'}), 404
     elif event_to_unfollow not in current_user.followed_events:
-        return jsonify({'message': 'Not following'}), 200
+        return jsonify({'message': f"{event_id} unfollowed"}), 200
     
     current_user.followed_events.remove(event_to_unfollow)
     db.session.commit()
@@ -274,11 +294,10 @@ def comment_event(event_id):
     """Comment an event by event id. Requires a jwt token."""
     user_id = get_jwt_identity()
     user = User.query.filter_by(id=user_id).first()
-    username = user.username
 
     event = Event.query.filter_by(id=event_id).first()
 
-    if User is None:
+    if user is None:
         return jsonify({'message': 'No such user'}), 404
     if event is None:
         return jsonify({'message': 'No such event'}), 404
@@ -311,20 +330,14 @@ def uncomment_event(comment_id):
 @jwt_required()
 def get_comments(event_id):
     """Get all comments for a post."""
-    try:
-        event = Event.query.filter_by(id=event_id).first()
-        
-        if event is None:
-            return jsonify({'message': 'No such event'}), 404
-        
-        comments = [comment.to_dict() for comment in event.comments.all()]
-
-        return jsonify({'comments': comments}), 200
+    event = Event.query.filter_by(id=event_id).first()
     
-    except Exception as e:
-        # Log the exception
-        logging.error(f"Error retrieving comments for event {event_id}: {e}")
-        return jsonify({'message': 'An error occurred while retrieving comments'}), 500
+    if event is None:
+        return jsonify({'message': 'No such event'}), 404
+    
+    comments = [comment.to_dict() for comment in event.comments.all()]
+
+    return jsonify({'comments': comments}), 200
 
 
 @app.route('/event/get_events', methods=['GET'])
