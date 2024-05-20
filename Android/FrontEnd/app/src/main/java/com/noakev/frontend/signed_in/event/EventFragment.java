@@ -57,17 +57,12 @@ import java.util.Locale;
 public class EventFragment extends Fragment {
     private final String currentUser = GlobalUser.getUsername();
     private static final int REQUEST_CODE = 22;
-    private JSONObject newPost;
     private FragmentEventBinding binding;
-    private Button postBtn;
     private LocationManager locationManager;
     private LocationListener locationListener;
     private String currentAddress;
     private Bitmap photo;
 
-    public interface DataFetchedCallbackPost {
-        void onDataFetched();
-    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -131,11 +126,6 @@ public class EventFragment extends Fragment {
             public void onError(APIObject apiObject) {}
         });
     }
-
-/*
-                        String jsonStringFromByteArray = new String(byteArray, StandardCharsets.UTF_8);
-                        APIObject errorResponse = gson.fromJson(jsonStringFromByteArray, APIObject.class);
- */
 
     private byte[] createBody() {
         JSONObject jsonObject = new JSONObject();

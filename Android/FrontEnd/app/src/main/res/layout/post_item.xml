@@ -35,7 +35,18 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="90pt">
+                android:layout_marginLeft="70pt">
+
+                <TextView
+                    android:id="@+id/likes"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginRight="15dp"
+                    android:text="15"
+                    android:textSize="20dp"
+                    android:textColor="@color/black"
+                    android:src="@drawable/heartunliked"
+                    android:tag="0" />
 
                 <ImageView
                     android:id="@+id/like"

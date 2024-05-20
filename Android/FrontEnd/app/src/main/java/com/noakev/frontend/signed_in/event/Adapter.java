@@ -15,6 +15,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.noakev.frontend.GlobalUser;
 import com.noakev.frontend.backend.APIObject;
 import com.noakev.frontend.backend.BackEndCommunicator;
 import com.noakev.frontend.backend.ResponseListener;
@@ -24,8 +25,10 @@ import com.noakev.frontend.R;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
+    private String currentUser = GlobalUser.getUsername();
     private ArrayList<HashMap> localData;
     private Context context;
     private Activity activity;
@@ -48,7 +51,8 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
         holder.description.setText(event.get("description").toString());
         holder.eventImage.setImageBitmap(getStringAsImage(event.get("photo").toString()));
         holder.location.setText(event.get("location").toString());
-        holder.like.setTag(0);
+        setLikeTag(event.get("id").toString(), holder);
+
 
         holder.like.setOnClickListener(v -> {
             saveLikeToBackEnd(event.get("id").toString(), holder);
@@ -60,17 +64,40 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
         });
     }
 
+    private void setLikeTag(String eventID, ViewHolder holder) {
+        BackEndCommunicator communicator = new BackEndCommunicator();
+        communicator.sendRequest(0, "/event/check_following/" + eventID, null, context, new ResponseListener() {
+            @Override
+            public void onSucces(APIObject apiObject) {
+                String output = apiObject.getMessage();
+                if (Objects.equals(output, "true")) {
+                    holder.like.setTag(0);
+                    holder.like.setImageResource(R.drawable.heartunliked);
+                } else if (Objects.equals(apiObject.getMessage(), "false")) {
+                    holder.like.setTag(1);
+                    holder.like.setImageResource(R.drawable.heartliked);
+                }
+                holder.likes.setText(apiObject.getAmount_of_likes());
+            }
+            @Override
+            public void onError(APIObject apiObject) {}
+        });
+    }
+
     private void saveLikeToBackEnd(String eventID, ViewHolder holder) {
         BackEndCommunicator communicator = new BackEndCommunicator();
         String input = "";
+        Log.v("LIKE", eventID);
 
         if (holder.like.getTag().toString().equals("0")) {
             input = "follow";
             holder.like.setImageResource(R.drawable.heartliked);
+            holder.likes.setText(String.valueOf(Integer.valueOf(holder.likes.getText().toString())+1));
             holder.like.setTag("1");
         } else if (holder.like.getTag().toString().equals("1")) {
             input = "unfollow";
             holder.like.setImageResource(R.drawable.heartunliked);
+            holder.likes.setText(String.valueOf(Integer.valueOf(holder.likes.getText().toString())-1));
             holder.like.setTag("0");
         }
 
@@ -99,11 +126,12 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public ImageView eventImage, like, comment;
-        public TextView publisher, description, comments, location;
+        public TextView publisher, description, comments, location, likes;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             like = itemView.findViewById(R.id.like);
+            likes = itemView.findViewById(R.id.likes);
             comment = itemView.findViewById(R.id.comment);
             publisher = itemView.findViewById(R.id.publisher);
             location = itemView.findViewById(R.id.location);

@@ -13,6 +13,7 @@ public class APIObject {
     private String description;
     private String token;
     private String message;
+    private String amount_of_likes;
     private ArrayList<Event> events;
     private ArrayList<Comment> comments;
     private ArrayList<String> followers;
@@ -60,6 +61,9 @@ public class APIObject {
 
     public ArrayList<String> getGrupper() {
         return grupper;
+    }
+    public String getAmount_of_likes() {
+        return amount_of_likes;
     }
     public boolean statusFail() {
         return status.equals("fail");
