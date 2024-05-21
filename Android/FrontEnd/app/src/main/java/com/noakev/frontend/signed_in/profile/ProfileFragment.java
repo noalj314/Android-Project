@@ -31,9 +31,9 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 /**
+ * The fragment for managing the different profiles.
  */
 public class ProfileFragment extends Fragment implements ClickListener {
-    private static final int REQUEST_CODE = 22;
     private String currentUser = GlobalUser.getUsername();
     private String currentAccount;
     private TextView followersTv;
@@ -118,6 +118,9 @@ public class ProfileFragment extends Fragment implements ClickListener {
         binding.followbtn.setVisibility(View.INVISIBLE);
     }
 
+    /**
+     * Send a request to backend to retrieve all followers.
+     */
     private void getFollowers() {
         BackEndCommunicator communicator = new BackEndCommunicator();
         communicator.sendRequest(0, "/user/get_followers/" + currentAccount, null, getContext(), new ResponseListener() {
@@ -135,6 +138,10 @@ public class ProfileFragment extends Fragment implements ClickListener {
         });
     }
 
+
+    /**
+     * Send a request to backend to retrieve all following.
+     */
     private void getFollowing() {
         BackEndCommunicator communicator = new BackEndCommunicator();
         communicator.sendRequest(0, "/user/get_following/" + currentAccount, null, getContext(), new ResponseListener() {
@@ -151,6 +158,9 @@ public class ProfileFragment extends Fragment implements ClickListener {
         });
     }
 
+    /**
+     * Check if the current account is followed by the signed in user.
+     */
     private void userIsFollowed() {
         BackEndCommunicator communicator = new BackEndCommunicator();
         communicator.sendRequest(0, "/user/check_following/"+currentAccount, null, getContext(), new ResponseListener() {
@@ -169,7 +179,6 @@ public class ProfileFragment extends Fragment implements ClickListener {
             }
         });
     }
-
 
     public void textClicked(String profileName) {
         HomeActivity homeActivity = (HomeActivity)(getActivity());

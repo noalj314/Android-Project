@@ -12,31 +12,17 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.RetryPolicy;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-import com.google.gson.Gson;
-import com.noakev.frontend.R;
 import com.noakev.frontend.backend.APIObject;
 import com.noakev.frontend.backend.BackEndCommunicator;
 import com.noakev.frontend.backend.ResponseListener;
 import com.noakev.frontend.databinding.FragmentCreateUserBinding;
-import com.noakev.frontend.databinding.FragmentSignInBinding;
-import com.noakev.frontend.signed_in.profile.Groups;
-import com.noakev.frontend.signed_in.profile.ProfileFragment;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
+/**
+ * The fragment for managing user creation and registration.
+ */
 public class CreateUserFragment extends Fragment {
     private TextView username;
     private TextView password;
@@ -61,6 +47,9 @@ public class CreateUserFragment extends Fragment {
         return binding.getRoot();
     }
 
+    /**
+     * Save the new user to the database.
+     */
     private void saveUser() {
         BackEndCommunicator communicator = new BackEndCommunicator();
         communicator.sendRequest(1, "/user/create", createBody(), getContext(), new ResponseListener() {
@@ -74,10 +63,10 @@ public class CreateUserFragment extends Fragment {
                 }
             }
             @Override
-            public void onError(APIObject apiObject) {
-            }
+            public void onError(APIObject apiObject) {}
         });
     }
+
     public byte[] createBody() {
         JSONObject jsonObject = new JSONObject();
         try {

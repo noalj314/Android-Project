@@ -53,6 +53,7 @@ import java.util.List;
 import java.util.Locale;
 
 /**
+ * The fragment for creating new events.
  */
 public class EventFragment extends Fragment {
     private final String currentUser = GlobalUser.getUsername();
@@ -172,6 +173,18 @@ public class EventFragment extends Fragment {
         binding.location.setText(currentAddress);
     }
 
+    /**
+     * Check if current user took an image.
+     *
+     * @param requestCode The integer request code originally supplied to
+     *                    startActivityForResult(), allowing you to identify who this
+     *                    result came from.
+     * @param resultCode The integer result code returned by the child activity
+     *                   through its setResult().
+     * @param data An Intent, which can return result data to the caller
+     *               (various data can be attached to Intent "extras").
+     *
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
@@ -183,6 +196,16 @@ public class EventFragment extends Fragment {
         }
     }
 
+    /**
+     * Check if the current user accepted gps tracking.
+     *
+     * @param requestCode The request code passed in {@link #requestPermissions(String[], int)}.
+     * @param permissions The requested permissions. Never null.
+     * @param grantResults The grant results for the corresponding permissions
+     *     which is either {@link android.content.pm.PackageManager#PERMISSION_GRANTED}
+     *     or {@link android.content.pm.PackageManager#PERMISSION_DENIED}. Never null.
+     *
+     */
     @SuppressLint("MissingPermission")
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {

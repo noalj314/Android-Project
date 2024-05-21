@@ -22,6 +22,9 @@ import com.noakev.frontend.signed_in.home.HomeFragmentDirections;
 import com.noakev.frontend.signed_in.profile.ProfileFragmentDirections;
 import com.noakev.frontend.signed_in.search.SearchFragmentDirections;
 
+/**
+ * The activity for being signed in.
+ */
 public class HomeActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
 
@@ -46,6 +49,9 @@ public class HomeActivity extends AppCompatActivity {
         navigationView.setCheckedItem(R.id.homeFragment);
     }
 
+    /**
+     * When the drawer is open and the user wants to close it.
+     */
     @Override
     public void onBackPressed() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
@@ -54,6 +60,11 @@ public class HomeActivity extends AppCompatActivity {
             super.onBackPressed();
         }
     }
+
+    /**
+     * Different navigations in HomeActivity. These are used outside of the drawer,
+     * I.e. when a button is pressed.
+     */
 
     public void navigateHome() {
         NavDirections action = EventFragmentDirections.actionEventFragmentToHomeFragment();

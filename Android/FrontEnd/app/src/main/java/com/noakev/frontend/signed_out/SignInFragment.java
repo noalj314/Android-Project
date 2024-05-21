@@ -12,12 +12,6 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-import com.google.gson.Gson;
 import com.noakev.frontend.GlobalUser;
 import com.noakev.frontend.backend.APIObject;
 import com.noakev.frontend.backend.BackEndCommunicator;
@@ -27,12 +21,10 @@ import com.noakev.frontend.databinding.FragmentSignInBinding;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-
+/**
+ * Our fragment for managing the sign in page.
+ */
 public class SignInFragment extends Fragment {
-    public interface DataFetchedCallbackSign {
-        void onDataFetched();
-    }
-    private APIObject apiObject;
     private TextView username;
     private TextView password;
     @Override
@@ -61,9 +53,12 @@ public class SignInFragment extends Fragment {
         return binding.getRoot();
     }
 
+    /**
+     * Check if their is a user with given username and passwords.
+     */
     public void getDataVolley(String route) {
         BackEndCommunicator communicator = new BackEndCommunicator();
-        communicator.sendRequest(1, route, getBody(), getContext(), new ResponseListener() {
+        communicator.sendRequest(1, route, createBody(), getContext(), new ResponseListener() {
             public void onSucces(APIObject apiObject) {
                 if (apiObject.statusFail()) {
                     Toast.makeText(getContext(), "Wrong username or password", Toast.LENGTH_SHORT).show();
@@ -79,7 +74,10 @@ public class SignInFragment extends Fragment {
         });
     }
 
-    public byte[] getBody() {
+    /**
+     * Create the JSON Object to send to back-end.
+     */
+    public byte[] createBody() {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("username", username.getText().toString());

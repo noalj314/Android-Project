@@ -11,26 +11,22 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-import com.google.gson.Gson;
 import com.noakev.frontend.backend.APIObject;
 import com.noakev.frontend.backend.BackEndCommunicator;
 import com.noakev.frontend.backend.ResponseListener;
 import com.noakev.frontend.signed_in.event.Event;
 import com.noakev.frontend.signed_in.event.Adapter;
-import com.noakev.frontend.signed_in.event.Posts;
 import com.noakev.frontend.databinding.FragmentHomeBinding;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * The fragment for managing the main feed.
+ */
 public class HomeFragment extends Fragment {
     private ArrayList<HashMap> data;
     private FragmentHomeBinding binding;
-    private RecyclerView recyclerView;
     private ArrayList<Event> events;
     private Adapter adapter;
 
@@ -50,6 +46,9 @@ public class HomeFragment extends Fragment {
         return binding.getRoot();
     }
 
+    /**
+     * Send a request to backend to retrieve all posts by the current user or the people it's following.
+     */
     public void getPostsFromBackEnd() {
         BackEndCommunicator communicator = new BackEndCommunicator();
         communicator.sendRequest(0, "/user/get_following/get_events", null, getContext(), new ResponseListener() {

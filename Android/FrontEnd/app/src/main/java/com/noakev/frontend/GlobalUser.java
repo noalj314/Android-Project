@@ -1,5 +1,8 @@
 package com.noakev.frontend;
 
+/**
+ * A class for storing the user that is currently signed in.
+ */
 public class GlobalUser {
     private static String token;
     private static String username;

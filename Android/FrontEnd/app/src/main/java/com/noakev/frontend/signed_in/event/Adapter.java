@@ -27,8 +27,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 
+/**
+ * The adapter for
+ */
 public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
-    private String currentUser = GlobalUser.getUsername();
     private ArrayList<HashMap> localData;
     private Context context;
     private Activity activity;

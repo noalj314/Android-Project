@@ -1,16 +1,14 @@
 package com.noakev.frontend.signed_in.event;
 
-import com.noakev.frontend.signed_in.profile.User;
-
+/**
+ * The event object.
+ */
 public class Event {
     private String event_id;
     private String username;
     private String photo;
     private String location;
     private String description;
-
-    public Event() {
-    }
 
     public String getLocation() {
         return location;

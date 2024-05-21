@@ -27,10 +27,8 @@ import java.util.HashMap;
 
 public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHolder> {
     private ArrayList<HashMap> localData;
-    private ClickListener listener;
     private Context context;
     private Activity activity;
-    private String username;
 
     public CommentAdapter() {
         this.localData = new ArrayList<>();

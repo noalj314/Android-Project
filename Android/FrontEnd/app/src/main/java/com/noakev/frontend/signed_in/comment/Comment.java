@@ -1,5 +1,8 @@
 package com.noakev.frontend.signed_in.comment;
 
+/**
+ * Comment object.
+ */
 public class Comment {
     private String id;
     private String username;

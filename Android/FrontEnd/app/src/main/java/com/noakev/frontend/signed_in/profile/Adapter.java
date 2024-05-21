@@ -12,6 +12,9 @@ import com.noakev.frontend.databinding.RowBinding;
 
 import java.util.ArrayList;
 
+/**
+ * The adapter for loading in followers and following.
+ */
 public class Adapter extends RecyclerView.Adapter<Adapter.RecyclerViewHolder> {
 
     private ArrayList<String> data;
@@ -23,7 +26,6 @@ public class Adapter extends RecyclerView.Adapter<Adapter.RecyclerViewHolder> {
     @NonNull
     @Override
     public RecyclerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // Skapa en ViewHolder och returner
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         RowBinding binding = RowBinding.inflate(inflater, parent, false);
         return new RecyclerViewHolder(binding);
