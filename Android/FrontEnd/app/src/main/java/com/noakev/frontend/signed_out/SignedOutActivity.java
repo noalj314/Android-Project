@@ -10,6 +10,9 @@ import androidx.navigation.Navigation;
 import com.noakev.frontend.R;
 import com.noakev.frontend.signed_in.HomeActivity;
 
+/**
+ * The activity for being signed out. Contains 2 different fragments.
+ */
 public class SignedOutActivity extends AppCompatActivity {
 
     @Override

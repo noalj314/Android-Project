@@ -1,4 +1,4 @@
-package com.noakev.frontend.signed_in.post;
+package com.noakev.frontend.signed_in.event;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -27,25 +27,43 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.noakev.frontend.databinding.FragmentPostBinding;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
+import com.noakev.frontend.GlobalUser;
+import com.noakev.frontend.backend.APIObject;
+import com.noakev.frontend.backend.BackEndCommunicator;
+import com.noakev.frontend.backend.ResponseListener;
+import com.noakev.frontend.databinding.FragmentEventBinding;
+import com.noakev.frontend.signed_in.HomeActivity;
+import com.noakev.frontend.signed_out.SignInFragment;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
 
 /**
+ * The fragment for creating new events.
  */
-public class PostFragment extends Fragment {
+public class EventFragment extends Fragment {
+    private final String currentUser = GlobalUser.getUsername();
     private static final int REQUEST_CODE = 22;
-    private FragmentPostBinding binding;
-    private Button postBtn;
+    private FragmentEventBinding binding;
     private LocationManager locationManager;
     private LocationListener locationListener;
     private String currentAddress;
     private Bitmap photo;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,14 +72,16 @@ public class PostFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        binding = FragmentPostBinding.inflate(getLayoutInflater(), container, false);
+        binding = FragmentEventBinding.inflate(getLayoutInflater(), container, false);
 
+        TextView username = binding.publisher;
         Button selfieBtn = binding.selfiebutton;
         Button locationBtn = binding.locationbtn;
         Button postBtn = binding.postbtn;
+        binding.location.setText("Linköping");
 
-        // Logik för att hämta användare
-        // binding.publisher.setText(getCurrentUser);
+        username.setText(GlobalUser.getUsername());
+
         selfieBtn.setOnClickListener(v -> {
             Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             startActivityForResult(cameraIntent, REQUEST_CODE);
@@ -75,10 +95,8 @@ public class PostFragment extends Fragment {
 
     private void createNewPost() {
         if (allColumnsAreFilled()) {
-            //Post post = new Post(String.valueOf(binding.description.getText()), currentAddress, getImageAsString());
-
             Toast.makeText(getContext(), "Creating post...", Toast.LENGTH_SHORT).show();
-            // Save to database
+            saveEventToBackend();
         } else {
             Toast.makeText(getContext(), "Insufficient information!", Toast.LENGTH_SHORT).show();
         }
@@ -86,18 +104,43 @@ public class PostFragment extends Fragment {
 
     private boolean allColumnsAreFilled() {
         if (String.valueOf(binding.description.getText()).isEmpty()) {
-            Log.v("a", "a");
             return false;
         } else if (String.valueOf(binding.location.getText()).isEmpty()) {
-            Log.v("b", "b");
             return false;
         } else if (getImageAsString().isEmpty()) {
-            Log.v("c", "c");
             return false;
         }
         return true;
     }
 
+    private void saveEventToBackend() {
+        BackEndCommunicator communicator = new BackEndCommunicator();
+        communicator.sendRequest(1, "/event/create", createBody(), getContext(), new ResponseListener() {
+            @Override
+            public void onSucces(APIObject apiObject) {
+                Toast.makeText(getContext(), "Successfully created post.", Toast.LENGTH_SHORT).show();
+                HomeActivity homeActivity = (HomeActivity)(getActivity());
+                homeActivity.navigateHome();
+            }
+
+            @Override
+            public void onError(APIObject apiObject) {}
+        });
+    }
+
+    private byte[] createBody() {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("username", currentUser);
+            jsonObject.put("location", binding.location.getText().toString());
+            jsonObject.put("description", binding.description.getText().toString());
+            jsonObject.put("photo", getImageAsString());
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        Log.v("JSON", jsonObject.toString());
+        return jsonObject.toString().getBytes();
+    }
 
     private void askForLocation() {
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
@@ -130,6 +173,18 @@ public class PostFragment extends Fragment {
         binding.location.setText(currentAddress);
     }
 
+    /**
+     * Check if current user took an image.
+     *
+     * @param requestCode The integer request code originally supplied to
+     *                    startActivityForResult(), allowing you to identify who this
+     *                    result came from.
+     * @param resultCode The integer result code returned by the child activity
+     *                   through its setResult().
+     * @param data An Intent, which can return result data to the caller
+     *               (various data can be attached to Intent "extras").
+     *
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
@@ -141,6 +196,16 @@ public class PostFragment extends Fragment {
         }
     }
 
+    /**
+     * Check if the current user accepted gps tracking.
+     *
+     * @param requestCode The request code passed in {@link #requestPermissions(String[], int)}.
+     * @param permissions The requested permissions. Never null.
+     * @param grantResults The grant results for the corresponding permissions
+     *     which is either {@link android.content.pm.PackageManager#PERMISSION_GRANTED}
+     *     or {@link android.content.pm.PackageManager#PERMISSION_DENIED}. Never null.
+     *
+     */
     @SuppressLint("MissingPermission")
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {

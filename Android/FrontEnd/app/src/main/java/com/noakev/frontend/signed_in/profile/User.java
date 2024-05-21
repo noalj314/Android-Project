@@ -1,8 +1,8 @@
 package com.noakev.frontend.signed_in.profile;
 
 public class User {
-    private String name;
+    private String username;
     public String getName() {
-        return name;
+        return username;
     }
 }

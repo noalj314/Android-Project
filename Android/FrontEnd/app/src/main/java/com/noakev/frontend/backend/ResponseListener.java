@@ -3,8 +3,7 @@ package com.noakev.frontend.backend;
 import com.android.volley.VolleyError;
 
 public interface ResponseListener {
+    void onSucces(APIObject apiObject);
 
-    void onResponse(String response);
-
-    void onError(VolleyError error);
+    void onError(APIObject apiObject);
 }

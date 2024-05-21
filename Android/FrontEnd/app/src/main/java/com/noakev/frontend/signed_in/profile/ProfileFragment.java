@@ -1,63 +1,74 @@
 package com.noakev.frontend.signed_in.profile;
 
-import static android.app.Activity.RESULT_OK;
-
-import android.content.Intent;
-import android.graphics.Bitmap;
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
-import com.noakev.frontend.backend.VolleyData;
+import com.noakev.frontend.GlobalUser;
+import com.noakev.frontend.backend.APIObject;
+import com.noakev.frontend.backend.BackEndCommunicator;
+import com.noakev.frontend.backend.ResponseListener;
 import com.noakev.frontend.databinding.FragmentProfileBinding;
+import com.noakev.frontend.signed_in.HomeActivity;
 
-import org.json.JSONObject;
+import java.util.ArrayList;
+import java.util.Objects;
 
 /**
+ * The fragment for managing the different profiles.
  */
 public class ProfileFragment extends Fragment implements ClickListener {
-    private static final int REQUEST_CODE = 22;
-    private String currentUser;
+    private String currentUser = GlobalUser.getUsername();
+    private String currentAccount;
     private TextView followersTv;
     private TextView followingTv;
     private FragmentProfileBinding binding;
-    private Groups followerGroups;
-    private Groups followingGroups;
+    private ArrayList<String> followerGroups;
+    private ArrayList<String> followingGroups;
     private Adapter followersAdapter;
     private Adapter followingAdapter;
-    private ImageView selfieHolder;
-    public interface DataFetchedCallback {
-        void onDataFetched(Groups groups);
-    }
-
+    private Button followBtn;
+    private TextView usernameTv;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentProfileBinding.inflate(getLayoutInflater(), container, false);
+
+        usernameTv = binding.username;
+        followBtn = binding.followbtn;
+
+        // SafeArgs is used to retrieve what user to navigate to. This way we don't need to
+        // create bundles and retrieve it, and we ensure type safety.
+        if (getArguments() != null) {
+            currentAccount = getArguments().getString("username");
+            if (!Objects.equals(currentAccount, currentUser)) {
+                usernameTv.setText(currentAccount);
+                userIsFollowed();
+            } else { sameUser(); }
+            setArguments(null);
+        } else { sameUser(); }
 
         RecyclerView followerRv = binding.groups;
         followerRv.setHasFixedSize(true);
@@ -73,71 +84,106 @@ public class ProfileFragment extends Fragment implements ClickListener {
         followingAdapter.setListener(ProfileFragment.this);
         followingRv.setAdapter(followingAdapter);
 
+        getFollowers();
+        getFollowing();
 
-        // Lok för att hämta nuvarande användare
-        // Get current user
-        TextView usernameTv = binding.username;
-        usernameTv.setText(currentUser);
+        followBtn.setOnClickListener(v -> {
+            String input = "";
+            BackEndCommunicator communicator = new BackEndCommunicator();
 
+            if (followBtn.getText().toString().equals("follow")) {
+                input = "follow";
+                followBtn.setText("unfollow");
+            } else if (followBtn.getText().toString().equals("unfollow")) {
+                input = "unfollow";
+                followBtn.setText("follow");
+            }
 
-        getDataVolley("https://brave-mud-8154b800471f41b1bbae6eea8237e22e.azurewebsites.net/grupper", (groups) -> {
-            followerGroups = groups;
-            followersAdapter.setData(followerGroups.getUsers());
-            followersTv = binding.numberoffollowers;
-            followersTv.setText("Followers: " + followersAdapter.getItemCount());
-        });
-
-        getDataVolley("https://brave-mud-8154b800471f41b1bbae6eea8237e22e.azurewebsites.net/grupper", (groups) -> {
-            followingGroups = groups;
-            followingAdapter.setData(followingGroups.getUsers());
-            followingTv = binding.numberoffollowing;
-            followingTv.setText("Following: " + followingAdapter.getItemCount());
-        });
-
-        VolleyData volleyData = new VolleyData();
-        JSONObject obj = new JSONObject();
-
-        selfieHolder = binding.selfieholder;
-        Button selfieBtn = binding.selfiebutton;
-        selfieBtn.setOnClickListener(v -> {
-            Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            startActivityForResult(cameraIntent, REQUEST_CODE);
+            communicator.sendRequest(1, "/user/"+input+"/" + currentAccount, null, getContext(), new ResponseListener() {
+                @Override
+                public void onSucces(APIObject apiObject) {
+                    Log.v("abcd", apiObject.getMessage());
+                }
+                @Override
+                public void onError(APIObject apiObject) {
+                    Log.v("abcd", apiObject.getMessage());
+                }
+            });
         });
 
         return binding.getRoot();
     }
-    public void getDataVolley(String url, DataFetchedCallback callback) {
-        // Instantiate the RequestQueue.
-        RequestQueue queue = Volley.newRequestQueue(getContext());
 
-        // Request a string response from the provided URL.
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                response -> {
-                    // Display the response string.
-                    Gson gson = new Gson();
-                    Groups groups = gson.fromJson(response, Groups.class);
-                    callback.onDataFetched(groups);
-                },
-                error -> Log.e("Network", error.getMessage())
-        );
-        queue.add(stringRequest);
+    private void sameUser() {
+        currentAccount = currentUser;
+        usernameTv.setText(currentAccount);
+        binding.followbtn.setVisibility(View.INVISIBLE);
+    }
+
+    /**
+     * Send a request to backend to retrieve all followers.
+     */
+    private void getFollowers() {
+        BackEndCommunicator communicator = new BackEndCommunicator();
+        communicator.sendRequest(0, "/user/get_followers/" + currentAccount, null, getContext(), new ResponseListener() {
+            @Override
+            public void onSucces(APIObject apiObject) {
+                followerGroups = apiObject.getFollowersList();
+                followersAdapter.setData(followerGroups);
+                followersTv = binding.numberoffollowers;
+                followersTv.setText("Followers: " + followersAdapter.getItemCount());
+            }
+            @Override
+            public void onError(APIObject apiObject) {
+                Log.v("Error", apiObject.getMessage());
+            }
+        });
+    }
+
+
+    /**
+     * Send a request to backend to retrieve all following.
+     */
+    private void getFollowing() {
+        BackEndCommunicator communicator = new BackEndCommunicator();
+        communicator.sendRequest(0, "/user/get_following/" + currentAccount, null, getContext(), new ResponseListener() {
+            @Override
+            public void onSucces(APIObject apiObject) {
+                followingGroups = apiObject.getFollowingList();
+                followingAdapter.setData(followingGroups);
+                followingTv = binding.numberoffollowing;
+                followingTv.setText("Following: " + followingAdapter.getItemCount());            }
+            @Override
+            public void onError(APIObject apiObject) {
+                Log.v("Error", apiObject.getMessage());
+            }
+        });
+    }
+
+    /**
+     * Check if the current account is followed by the signed in user.
+     */
+    private void userIsFollowed() {
+        BackEndCommunicator communicator = new BackEndCommunicator();
+        communicator.sendRequest(0, "/user/check_following/"+currentAccount, null, getContext(), new ResponseListener() {
+            @Override
+            public void onSucces(APIObject apiObject) {
+                Log.v("Response", apiObject.getMessage());
+                if (Objects.equals(apiObject.getMessage(), "true")) {
+                    binding.followbtn.setText("unfollow");
+                } else if (Objects.equals(apiObject.getMessage(), "false")) {
+                    binding.followbtn.setText("follow");
+                }
+            }
+            @Override
+            public void onError(APIObject apiObject) {
+                Log.e("Error", apiObject.getMessage());
+            }
+        });
     }
 
     public void textClicked(String profileName) {
-        // Logik för att kolla om currentProfile följer profileName
-        // Om ja -> byt profil
-        // Om nej "You're not following $"User"
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
-            Bitmap photo = (Bitmap) data.getExtras().get("data");
-            selfieHolder.setImageBitmap(photo);
-            // Logik för att spara bilden på backend
-        } else {
-            Toast.makeText(getContext(), "Cancelled", Toast.LENGTH_SHORT).show();
-            super.onActivityResult(requestCode, resultCode, data);
-        }
+        HomeActivity homeActivity = (HomeActivity)(getActivity());
+        homeActivity.navigateToSelf(profileName);
     }
 }

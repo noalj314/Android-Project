@@ -20,51 +20,47 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         >
-
-        <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:id="@+id/selfieholder"
-            android:paddingVertical="10dp"
-            android:paddingHorizontal="10dp"
-            />
-
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/selfieholder"
-            android:layout_centerInParent="true"
-            android:orientation="vertical"
+            android:orientation="horizontal"
+            android:id="@+id/info"
             >
-            <TextView
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="50dp"
+                    android:orientation="vertical"
+                    >
+
+                    <TextView
+                        android:id="@+id/username"
+                        android:layout_width="68dp"
+                        android:layout_height="wrap_content"
+                        android:text="username" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/numberoffollowers"
+                        android:text="Followers: 23"
+                        />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/numberoffollowing"
+                        android:text="Following: 17"
+                        />
+                </LinearLayout>
+
+            <Button
+                android:id="@+id/followbtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/username"
-                android:text="username"
-                />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/numberoffollowers"
-                android:text="Followers: 23"
-                />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/numberoffollowing"
-                android:text="Following: 17"
-                />
+                android:layout_marginLeft="100dp"
+                android:text="follow"
+                android:visibility="visible" />
         </LinearLayout>
 
-        <Button
-            android:id="@+id/selfiebutton"
-            android:layout_width="103dp"
-            android:layout_height="wrap_content"
-            android:text="Selfie"
-            android:layout_alignParentRight="true"
-            android:layout_marginHorizontal="20dp"
-            android:layout_centerInParent="true"
-            />
 
     </RelativeLayout>
 
@@ -110,11 +106,6 @@
                 android:scrollbars = "vertical"
                 />
         </LinearLayout>
-
-        <TableLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-        </TableLayout>
     </LinearLayout>
 
 </LinearLayout>
