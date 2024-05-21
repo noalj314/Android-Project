@@ -59,6 +59,8 @@ public class ProfileFragment extends Fragment implements ClickListener {
         usernameTv = binding.username;
         followBtn = binding.followbtn;
 
+        // SafeArgs is used to retrieve what user to navigate to. This way we don't need to
+        // create bundles and retrieve it, and we ensure type safety.
         if (getArguments() != null) {
             currentAccount = getArguments().getString("username");
             if (!Objects.equals(currentAccount, currentUser)) {
