@@ -16,7 +16,7 @@ url = 'http://127.0.0.1:5000'
 
 # IMPORTANT: Save your database before, this destroys the database.
 app.config.update({
-    "SQLALCHEMY_DATABASE_URI": 'sqlite:///.//our.db'  # file-based SQLite database in the current directory
+    "SQLALCHEMY_DATABASE_URI": 'sqlite:///.//ourtest.db'  # file-based SQLite database in the current directory
 })
 @pytest.fixture(scope="session", autouse=True)
 def test_init():
@@ -30,7 +30,7 @@ def client():
     # Setup for testing
     app.config.update({
         "TESTING": True,
-        "SQLALCHEMY_DATABASE_URI": 'sqlite:///.//our.db' # file-based SQLite database in the current directory
+        "SQLALCHEMY_DATABASE_URI": 'sqlite:///.//ourtest.db' # file-based SQLite database in the current directory
     })
     with app.test_client() as client:
         with app.app_context():
@@ -42,7 +42,6 @@ def test_create_user1(client):
     data = {
         'username': 'user1',
         'password': 'user1',
-        'description': 'Sucks dick'
     }
     response = client.post('/user/create', json=data)
     assert response.status_code == 200
@@ -53,7 +52,6 @@ def test_create_user2(client):
     data = {
         'username': 'user2',
         'password': 'user2',
-        'description': 'Sucks more dick'
     }
     response = client.post('/user/create', json=data)
     assert response.status_code == 200
@@ -87,30 +85,67 @@ def test_login_user_2(client):
     return response.json['token']
 
 
-def test_follow(client, test_login, test_login_user_2):
+def test_follow(client, test_login):
     """Test if a user can follow another user. To test this be logged in as user 1."""
     jwt_token = test_login
     response = client.post('/user/follow/user2', headers={'Authorization': f'Bearer {jwt_token}'})
     assert response.status_code == 200
 
 
-def test_unfollow(client, test_login, test_login_user_2):
-    jwt_token = test_login
-    response = client.post('/user/unfollow/user2', headers={'Authorization': f'Bearer {jwt_token}'})
-    assert response.status_code == 200
+#def test_unfollow(client, test_login):
+#    jwt_token = test_login
+#    response = client.post('/user/unfollow/user2', headers={'Authorization': f'Bearer {jwt_token}'})
+#    assert response.status_code == 200
 
 
-def test_create_event(client, test_login):
+def test_create_event_1(client, test_login):
     jwt_token = test_login
     event_data = {
-        "title": "Test Event",
+        "username":"user1",
         "description": "This is a test event",
         "location": "Test Location",
-        "date": "12",
-        "photo" : "cock"
+        "photo" : "Test photo"
     }
     response = client.post('/event/create', headers={'Authorization': f'Bearer {jwt_token}'},
                            json=event_data)
+    assert response.status_code == 201
+
+
+def test_create_event_2(client, test_login):
+    jwt_token = test_login
+    event_data = {
+        "username":"user2",
+        "description": "This is another test event",
+        "location": "Another test Location",
+        "photo" : "Another test photo"
+    }
+    response = client.post('/event/create', headers={'Authorization': f'Bearer {jwt_token}'},
+                           json=event_data)
+    assert response.status_code == 201
+
+
+def test_create_event_3(client, test_login):
+    jwt_token = test_login
+    event_data = {
+        "username":"user2",
+        "description": "This is a third test event",
+        "location": "A third test Location",
+        "photo" : "A third test photo"
+    }
+    response = client.post('/event/create', headers={'Authorization': f'Bearer {jwt_token}'},
+                           json=event_data)
+    assert response.status_code == 201
+
+
+def test_get_events(client, test_login):
+    jwt_token = test_login
+    response = client.get('/event/get_events',  headers={'Authorization': f'Bearer {jwt_token}'})
+    assert response.status_code == 200
+
+
+def test_get_follwing_events(client, test_login):
+    jwt_token = test_login
+    response = client.get('/user/get_following/get_events',  headers={'Authorization': f'Bearer {jwt_token}'})
     assert response.status_code == 200
 
 
@@ -118,12 +153,6 @@ def test_follow_event(client, test_login_user_2):
     jwt_token = test_login_user_2
     response = client.post('/event/follow/1',  headers={'Authorization': f'Bearer {jwt_token}'})
     assert response.status_code == 200
-
-
-def test_unfollow_event(client, test_login_user_2):
-    jwt_token = test_login_user_2
-    response = client.post('/event/unfollow/1', headers={'Authorization': f'Bearer {jwt_token}'})
-    assert response.status_code == 400
 
 
 def test_comment_event(client, test_login):

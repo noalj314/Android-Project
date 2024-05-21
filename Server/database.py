@@ -40,8 +40,7 @@ event_going = db.Table('event_going',
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
-    photo = db.Column(db.String(200), nullable=True)  # add default later
-    description = db.Column(db.String(200), nullable=False)
+    #photo = db.Column(db.String(200), nullable=True)  # add default later
     password = db.Column(db.String, nullable=False)
 
     # Relationships
@@ -66,30 +65,30 @@ class User(db.Model):
     def to_dict(self):
         return {
             'id': self.id,
-            'username': self.username,
-            'email': self.email,
-            'description': self.description,
-            'photo': self.photo
+            'username': self.username
         }
 
     def username_to_dict(self):
         return {
             'username': self.username
         }
+    
+    def add_event(self, event):
+        self.created_events.append(event)
+        db.session.commit()
 
-    def __init__(self, username, password, description):
-        self.description = description
+    def __init__(self, username, password):
         self.username = username
         self.password = bcrypt.generate_password_hash(password).decode('utf-8')
 
 
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    username = db.Column(db.String(20), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     location = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(200), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    photo = db.Column(db.String(200), nullable=True, default=None)  # no default
-    username = db.Column(db.String(20), nullable=False)
+    photo = db.Column(db.String(200), nullable=False)  # no default
 
     # Relationships
 
@@ -98,22 +97,36 @@ class Event(db.Model):
     event_followed_by = db.relationship('User', secondary=event_followed,
                                         back_populates="followed_events", lazy='dynamic')
 
-    def event_to_dict(self):
+    def to_dict(self):
         return {
-            'id': self.id,
-            'title': self.title,
-            'created_by_user_id': self.created_by_user_id,
+            'event_id': self.id,
+            'username': self.username,
             'location': self.location,
-            'date': self.date,
-            'description': self.description
+            'description': self.description,
+            'photo' : self.photo 
         }
+    
+    def size(self):
+        amount = 0
+        for user in self.event_followed_by:
+            amount += 1
+        return amount
 
 
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    text = db.Column(db.String(200), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
+    text = db.Column(db.String(200), nullable=False)
+
+    def to_dict(self):
+        username = User.query.filter_by(id=self.user_id).first().username
+        return {
+            'id': self.id,
+            'username':     username,
+            'event_id': self.event_id,
+            'text': self.text,
+        }
 
 
 class BlockedTokens(db.Model):
